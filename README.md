@@ -21,7 +21,7 @@
     @close="close"
     @selected="getVal"
 ></option-card>
-```   
+```
 
 - 特殊列表(多事件)
 
@@ -134,3 +134,5 @@ hobbyListData:{
   - Obj.title 标题
   - Obj.tip 浅色文字
   - Obj.default -> placeholder
+
+##test
