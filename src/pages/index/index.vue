@@ -133,7 +133,8 @@ import card from "@/components/card";
 import NNav from "@/components/nav";
 import NumberScroll from '@/components/numberScroll.vue'
 import { mapState } from 'vuex'
-
+/*引入请求*/
+import { homeLoad } from '@/apis/index'
 export default {
   data: function() {
     return {
@@ -210,19 +211,12 @@ export default {
   },
 
   created() {
-    wx.request({
-      url: 'http://www/baidu.com', //仅为示例，并非真实的接口地址
-      method:'POST',
-      data: {
-        x: '' ,
-        y: ''
-      },
-      header: {
-        'content-type': 'application/json' // 默认值
-      },
-      success: function(res) {
-        console.log(res.data)
-      }
+    homeLoad({
+      name:'小妹'
+    }).then(res=>{
+
+    }).catch(error=>{
+      console.log(error)
     })
   }
 };
