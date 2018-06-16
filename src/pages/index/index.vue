@@ -35,7 +35,7 @@
         <span>*数据来源合火人后台数据库，统计截止时间{{promptDate}}</span>
       </div>
     </div>
-  
+
     <div class="mainLink">
       <a href="/pages/projectShow/main">
         <div class="card card-one">
@@ -50,7 +50,7 @@
         </div>
       </a>
     </div>
-  
+
     <div class="class-swiper">
       <div class="subtitle">
         <span>运营课程</span>
@@ -108,7 +108,7 @@
           </swiper-item>
         </block>
       </swiper>
-     
+
     </div>
 
     <div class="footer">
@@ -189,7 +189,7 @@ export default {
       wx.navigateTo({
         url: '/pages/login/main'
       })
-      
+
     },
     toggle: function (e) {
       if(e === undefined) {
@@ -210,6 +210,20 @@ export default {
   },
 
   created() {
+    wx.request({
+      url: 'http://www/baidu.com', //仅为示例，并非真实的接口地址
+      method:'POST',
+      data: {
+        x: '' ,
+        y: ''
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function(res) {
+        console.log(res.data)
+      }
+    })
   }
 };
 </script>
