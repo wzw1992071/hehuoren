@@ -41,37 +41,42 @@ export default {
         }
     },
     methods:{
-        login(){
-            let that = this;
-            if(this.login_param.tel&&this.login_param.psd){
-                wx.request({
-                    url: 'http://www.schehuoren.com/index.php?m=Mobile&c=member&a=login',
-                    data: that.login_param,
-                    header: {
-                        'content-type': 'application/json' // 默认值
-                    },
-                    success: function(res) {
-                        if(res.data.status>0){
-                            wx.navigateTo({
-                                url: "/pages/project/main"
-                            })
-                        }else{
-                            wx.showToast({
-                                title: '用户名或密码错误',
-                                icon: 'none',
-                                duration: 2000
-                            })
-                        }
-                        
-                    }
+        login: function() {
+            let _tel = this.tel;
+            let _psw = this.psw;
+            let params = new URLSearchParams();
+            params.append("separate", 1);
+            this.$store
+                .dispatch("Login", {
+                tel: _tel,
+                psw: _psw
                 })
-            }
-            
-        }
-    },
-    mounted (){
-        console.log(1)
-    }
+                .then(() => {
+                let _token = this.$store.getters.token
+                if(_token) {
+                    params.append("token", _token);
+                    let _afterLogin = this.afterLogin
+                    _afterLogin(params)
+                } else {
+                    Toast('请输入正确的用户名和密码');
+                }
+            })
+        },
+        afterLogin(params){
+            request({
+                url: "/member",
+                method: "post",
+                data: params
+            }).then(res => {
+                if (res.data && res.data.rosData) {
+                this.$store.dispatch("SetUserinfo", res.data.rosData);
+                }
+            })
+        },
+},
+mounted (){
+    console.log(1)
+}
 }
 </script>
 
