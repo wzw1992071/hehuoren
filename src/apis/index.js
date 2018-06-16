@@ -2,7 +2,7 @@ import service from '@/utils/request';
 
 export function homeLoad(data) {
   return service({
-    url:'http://www.schehuoren.com',
+    url:'/',
     data,
     method:'POST'
   });
@@ -10,7 +10,7 @@ export function homeLoad(data) {
 
 export function myMassage(data) {
   return service({
-    url:'http://www.schehuoren.com/member/member_my_msg',
+    url:'/member/member_my_msg',
     data,
     method:'POST'
   });

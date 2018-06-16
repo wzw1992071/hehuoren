@@ -8,7 +8,10 @@ const user = {
             state.isLogin = !_isLogin
         },
         LOGOUT: state => {
-            state.isLogin = false
+            state.isLogin = false;
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
         }
     },
     actions: {

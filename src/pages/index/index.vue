@@ -212,21 +212,10 @@ export default {
 
   created() {
     homeLoad({
-      separate:'1'
+      separate:1
     }).then(res=>{
         console.log(res)
     }).catch(error=>{
-      console.log(error)
-    });
-    myMassage({
-      separate: '1',
-      msgtype:'5',
-      status_2:'no',
-      page:'1'
-    }).then(res => {
-      console.log(res)
-    }).catch(error => {
-      console.log(error)
     });
   }
 };
