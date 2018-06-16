@@ -134,7 +134,7 @@ import NNav from "@/components/nav";
 import NumberScroll from '@/components/numberScroll.vue'
 import { mapState } from 'vuex'
 /*引入请求*/
-import { homeLoad } from '@/apis/index'
+import { homeLoad, myMassage} from '@/apis/index'
 export default {
   data: function() {
     return {
@@ -217,7 +217,17 @@ export default {
         console.log(res)
     }).catch(error=>{
       console.log(error)
-    })
+    });
+    myMassage({
+      separate: '1',
+      msgtype:'5',
+      status_2:'no',
+      page:'1'
+    }).then(res => {
+      console.log(res)
+    }).catch(error => {
+      console.log(error)
+    });
   }
 };
 </script>

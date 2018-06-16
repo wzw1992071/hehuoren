@@ -7,3 +7,11 @@ export function homeLoad(data) {
     method:'POST'
   });
 }
+
+export function myMassage(data) {
+  return service({
+    url:'http://www.schehuoren.com/member/member_my_msg',
+    data,
+    method:'POST'
+  });
+}
