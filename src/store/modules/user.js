@@ -1,5 +1,5 @@
 
-import { login, logout_api, updateInfo, remove_local_data } from '@/api/login'
+import { login, logout_api, updateInfo, remove_local_data } from '@/apis/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'//这里要改
 import router from './../../router/index'
 import Cookies from 'js-cookie'//cookie要改
