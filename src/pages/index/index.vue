@@ -212,9 +212,9 @@ export default {
 
   created() {
     homeLoad({
-      name:'小妹'
+      separate:'1'
     }).then(res=>{
-
+        console.log(res)
     }).catch(error=>{
       console.log(error)
     })
