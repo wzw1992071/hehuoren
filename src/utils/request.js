@@ -1,6 +1,6 @@
 // 使用微信request
 const uri = 'http://api.schehuoren.com';
-const service = ({url,method,data}) =>{
+const request = ({url,method,data}) =>{
   return new Promise((resolve,reject)=>{
     wx.request({
       url:uri+url, //仅为示例，并非真实的接口地址
@@ -33,4 +33,4 @@ const service = ({url,method,data}) =>{
   })
 }
 
-export default service
+export default request

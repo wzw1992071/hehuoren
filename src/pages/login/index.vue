@@ -35,8 +35,8 @@ export default {
                 tel:"",
                 psd:"",
                 separate:1
-            }
-
+            },
+            isLogin: this.$store.getters.isLogin
             
         }
     },
