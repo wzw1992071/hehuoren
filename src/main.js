@@ -16,15 +16,15 @@ export default {
     // 页面前带有 ^ 符号的，会被编译成首页，其他页面可以选填
     // 首页：^pages/index/main, 开发可更改首页方便调试
     pages: [
-      'pages/index/main', // 首页
+      '^pages/index/main', // 首页
       'pages/logs/main', // 日志
       'pages/partner/main', // 合伙人
-      '^pages/login/main', // 登陆
+      'pages/login/main', // 登陆
       'pages/sign/main', // 注册
       'pages/user/main', // 个人中心
       'pages/advise/main', // 我要吐槽
       'pages/message/main', // 消息
-      'pages/project/main', // 我的项目 
+      'pages/project/main', // 我的项目
       'pages/projectData/main', // 创建项目
       'pages/manual/main', // 手册
       'pages/projectdetails/main', // 项目详情
