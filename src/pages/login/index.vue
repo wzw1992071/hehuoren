@@ -10,11 +10,11 @@
             <div class="form">
                 <div class="inp">
                     <img src="/static/images/iconPhone.png" alt="">
-                    <input type="text" placeholder="请输入电话号码">
+                    <input type="text" v-model="login_param.tel" placeholder="请输入电话号码">
                 </div>
                 <div class="inp psw">
                     <img src="/static/images/iconPassword.png" alt="">
-                    <input type="password" placeholder="请输入密码">
+                    <input type="password" v-model="login_param.psd" placeholder="请输入密码">
                 </div>
                 <div class="submit">
                     <button type="submit" @click="login">登陆</button>
@@ -27,17 +27,46 @@
 </template>
 
 <script>
+// import user from '../../utils/request.js'
 export default {
     data(){
         return {
+            login_param:{
+                tel:"",
+                psd:"",
+                separate:1
+            }
+
             
         }
     },
     methods:{
         login(){
-            wx.navigateTo({
-                url: "/pages/project/main"
-            })
+            let that = this;
+            if(this.login_param.tel&&this.login_param.psd){
+                wx.request({
+                    url: 'http://www.schehuoren.com/index.php?m=Mobile&c=member&a=login',
+                    data: that.login_param,
+                    header: {
+                        'content-type': 'application/json' // 默认值
+                    },
+                    success: function(res) {
+                        if(res.data.status>0){
+                            wx.navigateTo({
+                                url: "/pages/project/main"
+                            })
+                        }else{
+                            wx.showToast({
+                                title: '用户名或密码错误',
+                                icon: 'none',
+                                duration: 2000
+                            })
+                        }
+                        
+                    }
+                })
+            }
+            
         }
     },
     mounted (){
