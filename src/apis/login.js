@@ -1,6 +1,6 @@
 import service from '@/utils/request';
 
-export function login(data) {
+export function loginIn(data) {
   return service({
     url:'/index.php?m=Mobile&c=member&a=login',
     data,

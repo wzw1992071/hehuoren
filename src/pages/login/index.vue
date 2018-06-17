@@ -10,11 +10,11 @@
             <div class="form">
                 <div class="inp">
                     <img src="/static/images/iconPhone.png" alt="">
-                    <input type="text" v-model="login_param.tel" placeholder="请输入电话号码">
+                    <input type="text" v-model="tel" placeholder="请输入电话号码">
                 </div>
                 <div class="inp psw">
                     <img src="/static/images/iconPassword.png" alt="">
-                    <input type="password" v-model="login_param.psd" placeholder="请输入密码">
+                    <input type="password" v-model="pwd" placeholder="请输入密码">
                 </div>
                 <div class="submit">
                     <button type="submit" @click="login">登陆</button>
@@ -27,57 +27,51 @@
 </template>
 
 <script>
-// import user from '../../utils/request.js'
-export default {
-    data(){
-        return {
-            login_param:{
-                tel:"",
-                psd:"",
-                separate:1
-            },
-            isLogin: this.$store.getters.isLogin
-            
-        }
+  export default {
+    data() {
+      return {
+        tel:"15908445448",
+        pwd:"123456",
+      }
     },
-    methods:{
-        login: function() {
-            let _tel = this.tel;
-            let _psw = this.psw;
-            let params = new URLSearchParams();
-            params.append("separate", 1);
-            this.$store
-                .dispatch("Login", {
-                tel: _tel,
-                psw: _psw
-                })
-                .then(() => {
-                let _token = this.$store.getters.token
-                if(_token) {
-                    params.append("token", _token);
-                    let _afterLogin = this.afterLogin
-                    _afterLogin(params)
-                } else {
-                    Toast('请输入正确的用户名和密码');
-                }
-            })
-        },
-        afterLogin(params){
-            request({
-                url: "/member",
-                method: "post",
-                data: params
-            }).then(res => {
-                if (res.data && res.data.rosData) {
-                this.$store.dispatch("SetUserinfo", res.data.rosData);
-                }
-            })
-        },
-},
-mounted (){
-    console.log(1)
-}
-}
+    methods: {
+      login: function () {
+        let tel = this.tel.trim();
+        let pwd = this.pwd;
+        let params = {tel, pwd, separate:1};
+        this.$store.dispatch("Login", params).then((res) => {
+          wx.showToast({
+            title: res,
+            icon: 'none',
+            duration: 2000
+          });
+          wx.reLaunch({
+            url:'/pages/index/main'
+          });
+        },error=>{
+          wx.showToast({
+            title: error,
+            icon: 'none',
+            duration: 2000
+          })
+        }).catch(error=>{Toast(error)})
+      },
+      afterLogin(params) {
+        request({
+          url: "/member",
+          method: "post",
+          data: params
+        }).then(res => {
+          if (res.data && res.data.rosData) {
+            this.$store.dispatch("SetUserinfo", res.data.rosData);
+          }
+        })
+      },
+    },
+    mounted() {
+
+    }
+  }
 </script>
 
 <style>

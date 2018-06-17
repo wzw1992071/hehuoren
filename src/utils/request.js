@@ -6,17 +6,12 @@ const request = ({url,method,data}) =>{
       url:uri+url, //仅为示例，并非真实的接口地址
       data,
       method,
-      header: {'content-type': 'application/json'},
+      header: {'content-type': 'application/x-www-form-urlencoded;charset=utf-8'},
       success: function(response) {
         const res = response.data;
         if(response.statusCode !== 200) { // 请求失败
           console.log('请求失败');
           return Promise.reject('error')
-        }
-        if(res.msg && res.msg.includes('登录')) {
-          wx.navigateTo({
-            url: '/pages/login/main'
-          })
         }
         // 非法token|其他客户端登录|token过期
         if(response.statusCode === 50008 || response.statusCode === 50012 || response.statusCode === 50014) {

@@ -80,7 +80,7 @@
       </swiper>
     </div>
 
-    <div class="project-swiper">
+    <div class="project-swiper" :wx:if="res">
       <div class="subtitle">
         <span>优质项目</span>
         <a href="/pages/projectShow/main">查看全部</a>
@@ -93,16 +93,16 @@
         :circular=1
         class="swiper-box"
         >
-        <block :wx:for="imgUrls" :wx:key="index">
+        <block :wx:for="res" :wx:key="index">
           <swiper-item>
             <div class="image">
-              <image :src="item" class="slide-image" width=100 />
+              <image v-bind:src="item?baseUrl+item.logo:''" class="slide-image" width=100 />
             </div>
             <div class="intro">
-              <div class="intro-title">午后阳光</div>
+              <div class="intro-title">{{item?item.title:''}}</div>
               <div class="intro-con">
-                <div>白领小资休闲娱乐好去处<span>路演阶段</span></div>
-                <div>热度<span>40%</span></div>
+                <div>{{item?item.yijuhua:''}}<span>{{item?item.diqu:''}}</span></div>
+                <div>热度<span>{{item?item.guanzhu_count:''}}%</span></div>
               </div>
             </div>
           </swiper-item>
@@ -128,18 +128,17 @@
   </view>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 import card from "@/components/card";
 import NNav from "@/components/nav";
 import NumberScroll from '@/components/numberScroll.vue'
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 /*引入请求*/
 import { homeLoad, myMassage} from '@/apis/index'
 export default {
   data: function() {
     return {
       tipsNumber: 12,
-      isLogin: this.$store.getters.isLogin,
       partnerTotal: 9655,
       projectTotal: 9825,
       promptDate: "2018年05月01日",
@@ -157,11 +156,8 @@ export default {
            img: '/static/images/blueFile.png'
          }
       ],
-      imgUrls: [
-        "http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg",
-        "http://img06.tooopen.com/images/20160818/tooopen_sy_175866434296.jpg",
-        "http://img06.tooopen.com/images/20160818/tooopen_sy_175833047715.jpg"
-      ],
+      banner: [],
+      res:[],// 优质项目
       indicatorDots: true,
       indicatorColor: "#fff",
       indicatorActiveColor: "#FF7803",
@@ -178,19 +174,22 @@ export default {
   },
 
   computed: {
-    // isLogin: this.$store.getters.isLogin
+    ...mapGetters(['isLogin','baseUrl']),
+  },
+
+  watch:{
+    'isLogin':function () {
+      this.optionsShow = false;
+      this.loadInfo();
+    }
   },
 
   methods: {
     toggleLogin: async function() {
-      // await this.$store.dispatch('toggleLogin')
-      // this.isLogin = this.$store.getters.isLogin
-
       // 微信跳转
-      wx.navigateTo({
+      wx.redirectTo({
         url: '/pages/login/main'
       })
-
     },
     toggle: function (e) {
       if(e === undefined) {
@@ -203,6 +202,22 @@ export default {
       }
     },
     scrollTop: function (e) {
+
+    },
+    loadInfo:function () {
+      homeLoad({
+        separate:1
+      }).then(res=>{
+        let data = res.data;
+        this.partnerTotal = data.tzrcountnum||0;
+        this.projectTotal = data.xmcountnum||0;
+        this.tipsNumber = data.no_read||0;
+        this.grade = data.grade||[];
+        this.banner = data.banner;
+        this.datajson = data.datajson||0;
+        this.res = data.res||[];
+      }).catch(error=>{
+      });
     },
     logout: async function () {
       this.$store.dispatch('logout')
@@ -210,13 +225,8 @@ export default {
     }
   },
 
-  created() {
-    homeLoad({
-      separate:1
-    }).then(res=>{
-        console.log(res)
-    }).catch(error=>{
-    });
+  mounted(){
+    this.loadInfo();
   }
 };
 </script>
