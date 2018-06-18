@@ -76,7 +76,7 @@ export default {
   methods: {
     listEvent(url) {
       if (url == "logout") {
-        console.log("log---out");
+        this.$store.dispatch('logout')
       } else {
         console.log(url);
         wx.navigateTo({

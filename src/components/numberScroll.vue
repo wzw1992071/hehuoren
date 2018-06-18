@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     onLoad: function (options) {
-      // 页面初始化 options为页面跳转所带来的参数 
+      // 页面初始化 options为页面跳转所带来的参数
     },
     onReady: function () {},
     onShow: function () {},
@@ -49,22 +49,22 @@ export default {
       this.numArray[0] = numStringArray.pop() || 0
     }
   },
-  created() {
-    this.num = 0;
-    let num = this.number;
-    let n = new NumberAnimate({
-      from: num, //开始时的数字
-      speed: 2000, // 总时间
-      refreshTime: 100, // 刷新一次的时间
-      decimals: 0, //小数点后的位数
-      onUpdate: () => { //更新回调函数
-        this.num = n.tempValue
-        this.numToString(this.num)
-      },
-      onComplete: () => { //完成回调函数
-      }
-    })
-
+  watch:{
+    'number':function () {
+      let num = this.number;
+      let n = new NumberAnimate({
+        from: num, //开始时的数字
+        speed: 2000, // 总时间
+        refreshTime: 100, // 刷新一次的时间
+        decimals: 0, //小数点后的位数
+        onUpdate: () => { //更新回调函数
+          this.num = n.tempValue
+          this.numToString(this.num)
+        },
+        onComplete: () => { //完成回调函数
+        }
+      })
+    }
   }
 }
 </script>
