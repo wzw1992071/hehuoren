@@ -86,6 +86,7 @@ export default {
                 // _count()
                 service({
                         url: `/index.php?m=Mobile&c=member&a=sendsms&tel=${this.mobile}`,
+                        method:'GET'
                     })
                     .then(function(){
                         if(response.status === 'success') {

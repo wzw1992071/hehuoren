@@ -13,7 +13,7 @@
         <div class="form">
             <div class="form-title">
                 <div class="title">反馈内容</div>
-                <div class="subtitle">反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容反馈内容</div>
+                <textarea class="subtitle" v-model="advises" placeholder="描述您在平台使用过程中遇到的问题或者投诉。我们会仔细倾听您的意见并尽快给您反馈。"></textarea>
             </div>
         </div>
         <button class="submit" type="submit" @click="submit">提交</button>
@@ -22,11 +22,14 @@
 
 <script>
 import userHeader from '@/components/userHeader.vue'
-
+import service from '@/utils/request';
 export default {
     data: function () {
         return {
-            advise: ''
+            advise: '',
+            advises:'',
+            alert: false,
+            alertText: '',
         }
     },
     components: {
@@ -34,7 +37,18 @@ export default {
     },
     methods: {
         submit () {
-            console.log(this.advise)
+            var _this = this
+            // console.log(this.$store.getters.token)
+            service({
+               url: `/member/apiTocao?separate=1&token=${this.$store.getters.token}&txt_sumbit=true&title=${this.advise}&content=${this.advises}`,
+               method: "POST", 
+            }).then(response => {
+                    _this.advise = ''
+                    _this.advises = ''
+                    wx.showToast({
+                        title:response.msg
+                    });
+                })           
         }
     }
 }
