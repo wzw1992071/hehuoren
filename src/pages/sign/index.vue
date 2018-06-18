@@ -1,3 +1,4 @@
+// 已完成
 <template>
     <div class="login">
         <div class="login-con">
@@ -10,27 +11,27 @@
             <div class="form">
                 <div class="inp">
                     <img src="/static/images/iconPhone.png" alt="">
-                    <input type="text" placeholder="请输入电话号码">
+                    <input type="text" placeholder="请输入电话号码" v-model="mobile">
                 </div>
                 <div class="inp verify">
                     <img src="/static/images/verify.png" alt="">
-                    <input type="text" placeholder="输入6位验证码">
+                    <input type="text" placeholder="输入6位验证码"  v-model="code">
                     <button class="resend" :class="{disabled}" @click="resend">重新发送{{countdown? countdown : ''}}</button>
                 </div>
                 <div class="inp psw">
                     <img src="/static/images/iconPassword.png" alt="">
-                    <input type="password" placeholder="请输入密码">
+                    <input type="password" placeholder="请输入密码"  v-model="password">
                 </div>
                 <div class="inp psw">
                     <img src="/static/images/iconPassword.png" alt="">
-                    <input type="password" placeholder="请再次输入密码">
+                    <input type="password" placeholder="请再次输入密码" v-model="psw2">
                 </div>
                 <div class="inp">
                     <img src="/static/images/recommend.png" alt="">
-                    <input type="text" placeholder="推荐人手机号码(选填)">
+                    <input type="text" placeholder="推荐人手机号码(选填)"  v-model="tuijian_mobile">
                 </div>
                 <div class="submit">
-                    <button type="submit">注册</button>
+                    <button type="submit" :class="{yes:agree}" @click="sign">注册</button>
                     <a href="/pages/login/main">登陆</a>
                 </div>
             </div>
@@ -39,9 +40,9 @@
                 <i><img v-if="agree" src="/static/images/blueTick.png"></i>
                 <p>同意<a href="/pages/index/main">《用户咨询服务协议》</a>及<a href="/pages/index/main">《风险告知书》</a>并愿意自行承担由此产生的所有风险。</p>
             </div>
-            <div class="create">
+            <!-- <div class="create">
                 <button :class="{yes:agree}">+创建项目</button>
-            </div>
+            </div> -->
         </div>
 
         </div>
@@ -49,12 +50,20 @@
 </template>
 
 <script>
+import service from '@/utils/request';
 export default {
     data: function () {
         return {
             countdown: 0,
             disabled: false,
-            agree: false
+            agree: false,
+            mobile: '',
+            password: '',
+            code: '',
+            tuijian_mobile: '',
+            separate: 1,
+            psw2: '',
+            sendCode: '发送验证码'
         }
     },
     methods: {
@@ -74,14 +83,76 @@ export default {
                 }, 1000);
             }
             if(!this.disabled) {
-                _count()
+                // _count()
+                service({
+                        url: `/index.php?m=Mobile&c=member&a=sendsms&tel=${this.mobile}`,
+                    })
+                    .then(function(){
+                        if(response.status === 'success') {
+                            _count()
+                        }else{
+                            wx.showToast({
+                                icon:'none',
+                                title:'response.msg'
+                            });
+                        }
+                    })
+                    .catch(function(){
+                        
+                    })
             }
         },
         getAgree: function () {
             let _agree = this.agree
             this.agree = !_agree
+        },
+        sign: function () {
+            if (this.agree) {
+                if(this.password !== this.psw2 && this.password !== '') {
+                    console.log('密码不一致')
+                    wx.showToast({
+                        icon:'none',
+                        title:'密码不一致'
+                    });
+                } else if(this.password === '') {
+                    wx.showToast({
+                        icon:'none',
+                        title:'密码不能为空'
+                    });
+                    console.log('密码不能为空')
+                } else {
+                    let params = {}
+                    params.mobile = this.mobile.trim();
+                    params.code = this.code
+                    params.password = this.password
+                    params.tuijian_mobile = this.tuijian_mobile
+                    params.separate = this.separate
+                    service({
+                        url: '/index.php?m=Mobile&c=member&a=regist',
+                        data: params,
+                        method: 'POST'
+                    }).then(res => {
+                        let self = this
+                        if(res.status == 1) {
+                            wx.showToast({
+                                title:'注册成功'
+                            });
+                            setTimeout(() => {
+                                wx.reLaunch({
+                                    url:'/pages/login/main'
+                                })
+                            }, 1000);
+                        } else {
+                            wx.showToast({
+                                title:'response.msg'
+                            });
+                        }
+                    }).catch(e => {
+                        console.log('what\'s wrong?')
+                    }) 
+                }
+            }
         }
-
     }
 }
 </script>
