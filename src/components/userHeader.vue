@@ -7,8 +7,9 @@
                     <span>{{city}}</span>
                     <img :src="cityImg" alt="">
                 </div>
-                <div class="opt">
+                <div class="opt"  @click="toggleOption">
                     <img src="/static/images/options.png" alt="">
+                    <main-option :optionsShow="show"></main-option>
                 </div>
             </div>
             <div class="user">
@@ -42,11 +43,12 @@
 
 <script>
   import {mapGetters} from 'vuex'
-
+  import mainOption from "@/components/mainOption"
   export default {
     props: ['isMessage'],
     data: function () {
       return {
+        show:false,
         time: '上午',
         bgImg: '/static/images/bg.png',
         city: '成都',
@@ -62,7 +64,13 @@
     computed: {
       ...mapGetters(['isLogin', 'userInfo','baseUrl'])
     },
+    components:{
+      mainOption
+    },
     methods: {
+      toggleOption() {
+        this.show = !this.show;
+      },
       login() {
         wx.navigateTo({
           url: '/pages/login/main'

@@ -1,18 +1,9 @@
 <template>
   <view class="container">
     <div class="mock" :wx:if="optionsShow" @click="toggle">
-      <div class="option-links">
-        <a href="/pages/index/main"><img src="/static/images/home.png" alt="">首页</a>
-        <a href="/pages/index/main"><img src="/static/images/createProject.png" alt="">创建项目</a>
-        <a href="/pages/projectShow/main"><img src="/static/images/manageProject.png" alt="">项目集锦</a>
-        <a href="/pages/partner/main"><img src="/static/images/user.png" alt="">合伙人风采</a>
-        <a href="/pages/index/main" :wx:if="!isLogin"><img src="/static/images/ordinance.png" alt="">条款规定</a>
-        <a @click="toggleLogin" :wx:if="!isLogin"><img src="/static/images/login.png" alt="">登录/注册</a>
-        <a href="/pages/user/main" :wx:if="isLogin"><img src="/static/images/users.png" alt="">个人中心</a>
-        <a @click="logout" :wx:if="isLogin"><img src="/static/images/login.png" alt="">退出</a>
-      </div>
+      <optlinks :optionsShow.sync="optionsShow"></optlinks>
     </div>
-    <scroll-view :scrol-y="1" @bindscroll="scrollTop" height="500px" >
+    <scroll-view v-bind:scrol-y="scrollY" v-bind:bindscroll="scrollTop" height="500px" >
     <div class="header">
       <NNav @toggle="toggle" :tipsNumber="tipsNumber" />
       <div class="counter">
@@ -37,18 +28,18 @@
     </div>
 
     <div class="mainLink">
-      <a href="/pages/projectShow/main">
+      <navigator open-type="switchTab" href="/pages/projectShow/main">
         <div class="card card-one">
           <div class="title">合火人</div>
           <div>查看项目</div>
         </div>
-      </a>
-      <a href="/pages/partner/main">
+      </navigator>
+      <navigator open-type="switchTab" href="/pages/partner/main">
         <div class="card card-two">
           <div class="title">项目方</div>
           <div> 优质投资人</div>
         </div>
-      </a>
+      </navigator>
     </div>
 
     <div class="class-swiper">
@@ -114,11 +105,11 @@
     <div class="footer">
       <img src="/static/images/logo-yellow.png" class="footer-logo">
       <div class="footer-links">
-        <a href="/pages/index/main">首页</a>
-        <a :wx:if="!isLogin" href="/pages/login/main">登录/注册</a>
-        <a href="/pages/manual/main">运营课程</a>
-        <a href="/pages/projectShow/main">项目集锦</a>
-        <a href="/pages/partner/main">优质合伙人</a>
+        <navigator open-type="switchTab" href="/pages/index/main">首页</navigator>
+        <navigator :wx:if="!isLogin" href="/pages/login/main">登录/注册</navigator>
+        <navigator href="/pages/manual/main">运营课程</navigator>
+        <navigator open-type="switchTab" href="/pages/projectShow/main">项目集锦</navigator>
+        <navigator open-type="switchTab" href="/pages/partner/main">优质合伙人</navigator>
       </div>
     </div>
     <div class="to-top">
@@ -131,6 +122,7 @@
 <script type="text/ecmascript-6">
 import card from "@/components/card";
 import NNav from "@/components/nav";
+import optlinks from '@/components/optlinks'
 import NumberScroll from '@/components/numberScroll.vue'
 import { mapGetters } from 'vuex'
 /*引入请求*/
@@ -138,11 +130,11 @@ import { homeLoad, myMassage} from '@/apis/index'
 export default {
   data: function() {
     return {
-      tipsNumber: 12,
+      tipsNumber: 0,
       partnerTotal: 0,
       projectTotal: 0,
       promptDate: "2018年05月01日",
-      scrollTop: 0,
+      scrollY: 1,
       // v-for wechat
       classInfos: [
         {
@@ -170,7 +162,8 @@ export default {
 
   components: {
     NNav,
-    NumberScroll
+    NumberScroll,
+    optlinks
   },
 
   computed: {
@@ -184,12 +177,7 @@ export default {
   },
 
   methods: {
-    toggleLogin: async function() {
-      // 微信跳转
-      wx.navigateTo({
-        url: '/pages/login/main'
-      })
-    },
+
     toggle: function (e) {
       if(e === undefined) {
         this.optionsShow = !this.optionsShow
@@ -201,10 +189,9 @@ export default {
       }
     },
 
-    scrollTop: function (e) {
-
-    },
     loadInfo:function () {
+      let myDate = new Date()
+      this.promptDate = `${myDate.getFullYear()}年${myDate.getMonth()+1}月${myDate.getDate()}日`;
       homeLoad({
         separate:1
       }).then(res=>{
@@ -218,8 +205,12 @@ export default {
         this.res = data.res || [];
       }).catch(error=>{});
     },
-    logout: async function () {
-      this.$store.dispatch('logout')
+
+    scrollTop:function(e){
+      console.log(e)
+    },
+    goTop(){
+      this.scrollY = 1;
     }
   },
 
@@ -500,41 +491,5 @@ export default {
   z-index: 1000;
 }
 
-.option-links {
-  width: 280rpx;
-  padding: 20rpx 40rpx;
-  background: #fff;
-  position: absolute;
-  top: 100rpx;
-  right: 20rpx;
-  border-radius: 10rpx;
-}
-
-.option-links:before {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 20rpx;
-  height: 20rpx;
-  transform: rotate(45deg);
-  top: -8rpx;
-  right: 20rpx;
-  background: #fff;
-}
-
-.option-links a {
-  display: block;
-  width: 210rpx;
-  height: 64rpx;
-  font-size: 30rpx;
-  display: flex;
-  align-items: center;
-}
-
-.option-links a img {
-  width: 30rpx;
-  height: 30rpx;
-  margin-right: 30rpx;
-}
 
 </style>

@@ -3,25 +3,35 @@
         <div class="logo"><img src="/static/images/logo.png" alt=""></div>
         <div class="title"></div>
         <div class="options">
-            <div class="tips"><img src="/static/images/speaker.png" alt=""><i class="tips-total" :wx:if="tipsNumber > 0">{{tipsNumber}}</i></div>
+            <div class="tips" @click="message">
+              <img src="/static/images/speaker.png" alt="">
+              <i class="tips-total" :wx:if="tipsNumber > 0">{{tipsNumber}}</i>
+            </div>
             <img src="/static/images/options.png" @click="toggle">
         </div>
     </div>
 </template>
 
 <script>
-export default {
+  import {mapGetters} from 'vuex'
+  export default {
     props: ['tipsNumber'],
-    data: function () {
-        return {
-        }
+    computed: {
+      ...mapGetters(['isLogin'])
     },
     methods: {
-        toggle: function () {
-            this.$emit('toggle')
+      toggle: function () {
+        this.$emit('toggle')
+      },
+      message() {
+        if (this.isLogin) {
+          wx.navigateTo({
+            url: '/pages/message/main'
+          })
         }
+      }
     }
-};
+  };
 </script>
 
 <style scoped>
