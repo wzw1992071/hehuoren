@@ -45,7 +45,7 @@
     <div class="class-swiper">
       <div class="subtitle">
         <span>运营课程</span>
-        <a href="/pages/manual/main">查看全部</a>
+        <navigator href="/pages/manual/main">查看全部</navigator>
       </div>
       <swiper
         :indicator-dots="indicatorDots"
@@ -74,7 +74,7 @@
     <div class="project-swiper" :wx:if="res">
       <div class="subtitle">
         <span>优质项目</span>
-        <a href="/pages/projectShow/main">查看全部</a>
+        <navigator open-type="switchTab" href="/pages/projectShow/main">查看全部</navigator>
       </div>
        <swiper
         :indicator-dots="0"
@@ -366,7 +366,7 @@ export default {
   transform: translate3d(0, -50%, 0);
 }
 
-.subtitle a {
+.subtitle ._navigator {
   font-size: 24rpx;
   color: #ccc;
   text-decoration: underline;
@@ -482,7 +482,7 @@ export default {
 }
 
 .mock {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
