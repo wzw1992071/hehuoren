@@ -11,8 +11,12 @@ const user = {
     LOGOUT: state => {
       // 修改state登录状态
       state.isLogin = false;
+      state.token = "";
+      state.userInfo = null;
       /*删除本地token*/
+      wx.removeStorage({key: 'token'});
       /*删除本地userInfo*/
+      wx.removeStorage({key: 'userInfo'})
     },
     //设置token
     SET_TOKEN: (state, token) => {
@@ -38,24 +42,31 @@ const user = {
       });
     },
     // 更新用户信息
-    UPDATE_USERINFO: (state, userinfo) => {
-      state.userInfo = userinfo;
+    UPDATE_USERINFO: (state) => {
       //存储
-      wx.setStorage({
-        key:"userInfo",
-        data:userinfo
-      });
+      wx.getStorage({
+        key:'token',
+        success:function (res) {
+         if(!!res.data) {
+           state.isLogin = true;
+           state.token = res.data;
+           wx.getStorage({
+             key:'userInfo',
+             success:function (response) {
+               state.userInfo = response.data;
+             }
+           })
+         }
+        }
+      })
     }
   },
   actions: {
     logout: ({commit}) => {
-      logout_api().then(() => {
-        commit('LOGOUT')
-        wx.navigateTo({
-          url: '/pages/login/main'
-        })
+      commit('LOGOUT')
+      wx.navigateTo({
+        url: '/pages/login/main'
       })
-      remove_local_data('hehuoren_form_1')
     },
     Login({commit}, params) {
       return new Promise((resolve, reject) => {
@@ -80,8 +91,8 @@ const user = {
     SetUserinfo({commit}, userInfo) {
       commit('SET_USERINFO', userInfo)
     },
-    UpdateInfo({commit}, userinfo) {
-      commit('UPDATE_USERINFO', userinfo)
+    UpdateInfo({commit}) {
+      commit('UPDATE_USERINFO')
     }
   }
 }
