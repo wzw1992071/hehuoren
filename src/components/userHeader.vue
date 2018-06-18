@@ -36,34 +36,56 @@
 </template>
 
 <script>
-export default {
-    props:['isMessage'],
+  import {mapGetters} from 'vuex'
+
+  export default {
+    props: ['isMessage'],
     data: function () {
-        return {
-            isLogin: this.$store.getters.isLogin,
-            // isLogin: false,
-            time: '上午',
-            bgImg: '/static/images/bg.png',
-            city: '成都',
-            cityImg: '/static/images/cloud.png',
-            avatar: '/static/images/testAvatar.png',
-            defaultAvatar: '/static/images/avatar.png',
-            name: '周星星',
-            level: '一般合伙人',
-            levelImg: '/static/images/update.png',
-            levelInfo: '提升等级',
-            tips: {
-                notRead: 4,
-                total: 10
-            }
+      return {
+        time: '上午',
+        bgImg: '/static/images/bg.png',
+        city: '成都',
+        cityImg: '/static/images/cloud.png',
+        avatar: '/static/images/testAvatar.png',
+        defaultAvatar: '/static/images/avatar.png',
+        name: '周星星',
+        level: '一般合伙人',
+        levelImg: '/static/images/update.png',
+        levelInfo: '提升等级',
+        tips: {
+          notRead: 4,
+          total: 10
         }
+      }
+    },
+    computed: {
+      ...mapGetters(['isLogin', 'userInfo'])
     },
     methods: {
-        login () {
-            console.log('login login')
+      login() {
+        console.log('login login')
+      },
+      setTimes(){
+        //获取上午下午
+        let now = new Date()
+        let hour = now.getHours();
+        if (hour < 9) {
+          this.time = "早上"
+        } else if (hour < 12) {
+          this.time = "上午"
+        } else if (hour < 14) {
+          this.time = "中午"
+        } else if (hour < 17) {
+          this.time = "下午"
+        } else if (hour < 22) {
+          this.time = "晚上"
         }
+      }
+    },
+    mounted(){
+      this.setTimes();
     }
-}
+  }
 </script>
 
 <style scoped>

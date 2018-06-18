@@ -221,7 +221,6 @@ export default {
     },
     logout: async function () {
       this.$store.dispatch('logout')
-      this.isLogin = false
     }
   },
 

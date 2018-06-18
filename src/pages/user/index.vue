@@ -21,11 +21,10 @@
 
 <script>
 import userHeader from "@/components/userHeader";
-
+import {mapGetters} from 'vuex'
 export default {
   data: function() {
     return {
-      isLogin: this.$store.getters.isLogin,
       loginArrow: '/static/images/arrow.png',
       notLoginArrow: '/static/images/nloginArrow.png',
       lists: [
@@ -70,6 +69,9 @@ export default {
   },
   components: {
     userHeader
+  },
+  computed:{
+    ...mapGetters(['token','userInfo','isLogin'])
   },
   methods: {
     listEvent(url) {

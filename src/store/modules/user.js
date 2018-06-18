@@ -76,7 +76,7 @@ const user = {
             const data = response.data;
             commit('SET_TOKEN',data.token);
             updateInfo(data.token).then(res=>{
-              commit('SET_USERINFO', res.data)
+              commit('SET_USERINFO', res.data.rosData)
             });
             resolve(response.msg)
           }else{
