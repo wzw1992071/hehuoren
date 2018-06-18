@@ -13,10 +13,15 @@
             </div>
             <div class="user">
                 <div class="user-info">
-                    <img :src="isLogin?avatar:defaultAvatar" class="avatar">
+                    <template v-if="isLogin">
+                      <img :src="userInfo?baseUrl+userInfo.icon:''" class="avatar" alt="">
+                    </template>
+                    <template v-if="!isLogin">
+                      <img src="/static/images/avatar.png" class="avatar">
+                    </template>
                     <div class="user-intro" v-if="isLogin">
-                        <span>{{name}}</span>
-                        <span>{{level}}</span>
+                        <span>{{userInfo?userInfo.truename:""}}</span>
+                        <span>{{userInfo?userInfo.gradeName:""}}</span>
                     </div>
                     <div class="user-notlogin" v-if="!isLogin">
                         <span>{{time}}好</span>
@@ -24,7 +29,7 @@
                     </div>
                 </div>
                 <div class="tips" v-if="isMessage?true:false">
-                    未读：{{tips.notRead}}条 总计：{{tips.total}}条
+                  未读：{{userInfo.no_read ? user.no_read : 0}}条 总计：{{tips.total}}条
                 </div>
                 <div v-if="isMessage?false:true" class="user-login">
                     <img :src="levelImg" class="levelImg">
@@ -46,10 +51,6 @@
         bgImg: '/static/images/bg.png',
         city: '成都',
         cityImg: '/static/images/cloud.png',
-        avatar: '/static/images/testAvatar.png',
-        defaultAvatar: '/static/images/avatar.png',
-        name: '周星星',
-        level: '一般合伙人',
         levelImg: '/static/images/update.png',
         levelInfo: '提升等级',
         tips: {
@@ -59,11 +60,13 @@
       }
     },
     computed: {
-      ...mapGetters(['isLogin', 'userInfo'])
+      ...mapGetters(['isLogin', 'userInfo','baseUrl'])
     },
     methods: {
       login() {
-        console.log('login login')
+        wx.navigateTo({
+          url: '/pages/login/main'
+        })
       },
       setTimes(){
         //获取上午下午

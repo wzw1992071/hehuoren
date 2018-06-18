@@ -139,8 +139,8 @@ export default {
   data: function() {
     return {
       tipsNumber: 12,
-      partnerTotal: 9655,
-      projectTotal: 9825,
+      partnerTotal: 0,
+      projectTotal: 0,
       promptDate: "2018年05月01日",
       scrollTop: 0,
       // v-for wechat
@@ -180,7 +180,6 @@ export default {
   watch:{
     'isLogin':function () {
       this.optionsShow = false;
-      this.loadInfo();
     }
   },
 
@@ -201,6 +200,7 @@ export default {
         }
       }
     },
+
     scrollTop: function (e) {
 
     },
@@ -209,15 +209,14 @@ export default {
         separate:1
       }).then(res=>{
         let data = res.data;
-        this.partnerTotal = data.tzrcountnum||0;
-        this.projectTotal = data.xmcountnum||0;
-        this.tipsNumber = data.no_read||0;
-        this.grade = data.grade||[];
+        this.partnerTotal = data.tzrcountnum || 0;
+        this.projectTotal = data.xmcountnum || 0;
+        this.tipsNumber = data.no_read || 0;
+        this.grade = data.grade || [];
         this.banner = data.banner;
-        this.datajson = data.datajson||0;
-        this.res = data.res||[];
-      }).catch(error=>{
-      });
+        this.datajson = data.datajson || 0;
+        this.res = data.res || [];
+      }).catch(error=>{});
     },
     logout: async function () {
       this.$store.dispatch('logout')
