@@ -3,7 +3,7 @@ const uri = 'http://api.schehuoren.com';
 const request = ({url,method,data}) =>{
   return new Promise((resolve,reject)=>{
     wx.request({
-      url:uri+url, //仅为示例，并非真实的接口地址
+      url:uri+url,
       data,
       method,
       header: {'content-type': 'application/x-www-form-urlencoded;charset=utf-8'},

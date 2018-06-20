@@ -1,24 +1,36 @@
 <template>
   <div class="container">
     <div class="nav">
-      <div class="search" @click="search">
+      <div class="search" @click="getSearch">
         <img v-if="!isSearch" src="/static/images/search.png">
         <img v-if="isSearch" src="/static/images/searchActive.png">
       </div>
       <div class="search-con" v-if="isSearch">
-        <input type="text" placeholder="搜索你感兴趣的项目" v-model="searchInfo">
+        <input type="text" placeholder="搜索你感兴趣的项目" v-model="title" :confirm-type="'搜索'" @confirm="search">
       </div>
       <div class="filter" v-if="!isSearch">
-        <div>全部等级
+        <div>
+          <picker mode='selector' @change="bindPickerChange($event,'grade')" range-key="name" :value="0" :range="selectRules['grade']">
+            {{texts.grade}}
+          </picker>
           <img src="/static/images/arrowDown.png">
         </div>
-        <div>全部行业
+        <div>
+          <picker mode='selector' @change="bindPickerChange($event,'type_data')" range-key="typename" :value="0" :range="selectRules['type_data']">
+            {{texts.type_data}}
+          </picker>
           <img src="/static/images/arrowDown.png">
         </div>
-        <div>全部地区
+        <div >
+          <picker mode='selector' @change="bindPickerChange($event,'area')" range-key="name" :value="0" :range="selectRules['area']">
+            {{texts.area}}
+          </picker>
           <img src="/static/images/arrowDown.png">
         </div>
-        <div>默认排序
+        <div>
+          <picker mode='selector' @change="bindPickerChange($event,'sort')" range-key="name" :value="0" :range="selectRules['sort']">
+            {{texts.sort}}
+          </picker>
           <img src="/static/images/arrowDown.png">
         </div>
       </div>
@@ -31,6 +43,7 @@
     <project-card></project-card>
 
     <main-option :optionsShow="show" @toggleShow="toggleOption"></main-option>
+
   </div>
 </template>
 
@@ -38,31 +51,150 @@
 <script>
 import mainOption from "@/components/mainOption"
 import projectCard from '@/components/projectCard'
-
+import {mapGetters} from 'vuex'
+import {getProjects} from '@/apis/index'
 export default {
   data: function() {
     return {
       show: false,
+      showSelect:false,
       isSearch: false,
-      searchInfo: ""
+      /*筛选条件*/
+      grade: null,
+      type_data: null,
+      area: null,
+      sort: null,
+      title: null,
+      page: 1,
+      /*可选项*/
+      selectRules:{
+        'grade':[
+          {
+            name:'全部等级',
+            val:0
+          },
+          {
+            name:'展示类项目',
+            val:1
+          },
+          {
+            name:'预热类项目',
+            val:2
+          },
+          {
+            name:'热门类项目',
+            val:3
+          },
+          {
+            name:'准路演类项目',
+            val:4
+          }
+        ],
+        'type_data':[],
+        'area':[],
+        'sort':[
+          {
+            name:'默认排序',
+            val:null
+          },
+          {
+            name:'更新时间',
+            val:'update'
+          },
+          {
+            name:'发布时间',
+            val:'add'
+          }
+        ],
+      },
+      texts: {
+        grade: "全部等级",
+        type_data: "全部行业",
+        area: "全部地区",
+        sort: "默认排序"
+      },
     }
   },
   methods: {
-    toggleOption: function() {
+    toggleOption() {
       this.show = !this.show;
     },
-    search: function() {
-      let _isSearch = this.isSearch;
-      if (_isSearch) {
-        console.log(this.searchInfo);
-      } else {
-        this.isSearch = true;
+    getSearch(){
+      if(this.isSearch){
+        // 请了key 避免bug
+        this.title = null
       }
+      this.isSearch=!this.isSearch;
+    },
+    search() {
+      if(!this.title){
+        this.isSearch=false;
+      }
+      this.resetForm();
+    },
+    // 重新初始化请求的form
+    resetForm(){
+      this.texts = {
+        grade: "全部等级",
+        type_data: "全部行业",
+        area: "全部地区",
+        sort: "默认排序"
+      };
+      this.grade=null;
+      this.type_data=null;
+      this.area=null;
+      this.sort=null;
+      this.getProjects();
+    },
+
+    bindPickerChange(event,type){
+      let index = event.mp.detail.value;
+      let target = this.selectRules[type][index];
+      if(type=='grade'){
+        this.texts[type] = target.name;
+        this.grade = target.val
+      }else if(type=='type_data'){
+        this.texts[type] = target.typename;
+        this.type_data = target.id
+      }else if(type=='area'){
+        this.texts[type] = target.name;
+        this.area = target.code
+      }else if(type=='sort'){
+        this.texts[type] = target.name;
+        this.sort = target.val
+      }
+      this.page = 1;
+      this.getProjects();
+    },
+    getProjects() {
+      let param = {
+        separate:1,
+        grade:this.grade,//等级
+        xiangmu_hy:this.type_data,
+        area:this.area,
+        sort:this.sort,
+        title:this.title,
+        page:this.page,
+      };
+      getProjects(param,this.token).then(res=>{
+        let data = res.data;
+        for(let key in this.selectRules){
+          if(!!data[key]) this.selectRules[key] = data[key];
+        }
+      }).catch(error=>{
+        console.log(error)
+      })
     }
+  },
+  mounted(){
+    this.getProjects();
   },
   components: {
       mainOption,
       projectCard
+  },
+  computed:{
+    ...mapGetters(['token'])
   }
 }
 </script>
@@ -113,7 +245,7 @@ export default {
 .nav .filter img {
   width: 16rpx;
   height: 10rpx;
-  margin-left: 12rpx; 
+  margin-left: 12rpx;
 }
 
 .option {

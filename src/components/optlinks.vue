@@ -1,10 +1,10 @@
 <template>
   <div class="option-links">
     <div class="link" @click="jump('/pages/index/main')"><img src="/static/images/home.png" alt="">首页</div>
-    <div class="link" @click="jump('/pages/index/main')"><img src="/static/images/createProject.png" alt="">创建项目</div>
+    <!--<div class="link" @click="jump('/pages/index/main')"><img src="/static/images/createProject.png" alt="">创建项目</div>-->
     <div class="link" @click="jump('/pages/projectShow/main')"><img src="/static/images/manageProject.png" alt="">项目集锦</div>
     <div class="link" @click="jump('/pages/partner/main')"><img src="/static/images/user.png" alt="">合伙人风采</div>
-    <div class="link" @click="jump('/pages/manual/main')" :wx:if="!isLogin"><img src="/static/images/ordinance.png" alt="">条款规定</div>
+    <!--<div class="link" @click="jump('/pages/manual/main')" :wx:if="!isLogin"><img src="/static/images/ordinance.png" alt="">条款规定</div>-->
     <div class="link" @click="toggleLogin" :wx:if="!isLogin"><img src="/static/images/login.png" alt="">登录/注册</div>
     <div class="link" @click="jump('/pages/user/main')" :wx:if="isLogin"><img src="/static/images/users.png" alt="">个人中心</div>
     <div class="link" @click="logout" :wx:if="isLogin"><img src="/static/images/login.png" alt="">退出</div>
