@@ -5,7 +5,7 @@
             <img v-if="collected" src="/static/images/collected.png">
         </div>
         <div class="img">
-            <img :src="imgUrl">
+            <img :src="detail&&baseUrl+detail.logo">
             <div class="heat-img" :class="{gray: gray}">
                 <img v-if="heat <= 50" src="/static/images/hot_low.png">
                 <img v-if="heat > 50" src="/static/images/hot_high.png">
@@ -14,7 +14,7 @@
         <div class="bottom">
             <div class="info">
                 <div class="name">
-                    <span>{{name}}</span>
+                    <span>{{detail.title}}</span>
                     <span>{{classification}}</span>
                 </div>
                 <p class="slogan">{{slogan}}</p>
@@ -28,29 +28,34 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: ['gray'],
-    data: function () {
-        return {
-            imgUrl: '/static/images/project-test1.png',
-            name: '爆炸鸭脖',
-            classification: '热门类项目',
-            slogan: '好特么好吃',
-            type: '餐饮美食|饮食饮料',
-            heat: 35,
-            collected: false
-        }
-    },
-    methods: {
-        collect: function () {
-            this.collected = !this.collected
+<script type="text/ecmascript-6">
+    import {mapGetters} from 'vuex'
+    export default {
+        props: ['gray', 'detail'],
+        data: function () {
+            return {
+                imgUrl: '/static/images/project-test1.png',
+                name: '爆炸鸭脖',
+                classification: '热门类项目',
+                slogan: '好特么好吃',
+                type: '餐饮美食|饮食饮料',
+                heat: 35,
+                collected: false
+            }
         },
-        emitEvent: function () {
-            this.$emit('event')
+        methods: {
+            collect: function () {
+                this.collected = !this.collected
+            },
+            emitEvent: function () {
+                console.log(this.detail)
+                this.$emit('handlerClick')
+            }
+        },
+        computed: {
+            ...mapGetters(['baseUrl'])
         }
     }
-}
 </script>
 
 <style>
@@ -170,7 +175,7 @@ export default {
     font-size: 28rpx;
     font-weight: 600;
     color: #333;
-    display: flex;   
+    display: flex;
     align-items: baseline;
 }
 
