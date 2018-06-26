@@ -1,14 +1,16 @@
 <template>
 <div>
     <alert :text="alertText" v-if="alert"></alert>
-    <div class="partner-card">
+    <div class="partner-card" >
        <div class="info">
-           <div class="avatar">
+           <!-- <div class="avatar">
                <img :src="avatar">
+           </div> -->
+           <div class="avatar" :style="{backgroundImage: 'url('+(info.icon?baseUrl+info.icon:avatar)+')'}">
            </div>
            <div class="user-info">
-               <h2>{{name}}</h2>
-                <p>粉丝数：{{fansNumber}}</p>
+               <h2>{{info.truename?info.truename:name}}</h2>
+                <p>粉丝数：{{info.fensi?info.fensi: fansNumber}}</p>
            </div>
         </div> 
         <div class="subinfo">
@@ -41,41 +43,129 @@
 
 <script>
 import Alert from '@/components/alert'
-
+import service from '@/utils/request';
+// import MessageBox from '@/components/message-box'
 export default {
+    props: ["info"],
     data: function () {
         return {
+            baseUrl: this.$store.getters.baseUrl,
             avatar: '/static/images/avatar.png', // 头像
             name: 'Arthur', // 名字
             fansNumber: 200, // 粉丝数
             level: '一般合伙人', // 合伙人
             alert: false,
             alertText: '',
-            isConcern: false
+            isConcern: false,
+            isLogin: this.$store.getters.isLogin,
+            userid:1,
+            // userid: this.$store.getters.userInfo.userid,
+            token: this.$store.getters.token,
         }
     },
     methods: {
+
+        //跳转
+        gotodetails() {
+            this.isLogin
+            ?wx.navigateTo({
+                //暂缺页面
+                url:`/pages/hehuorendetails/main?id=${this.info.userid}`
+            })
+            :wx.reLaunch({
+                url:`/pages/login/main`
+            })
+        },
         // 邀请
         invite: function () {
             console.log('invite')
         },
         // 关注
         concern: function () {
-            // 成功
-            let _text = this.isConcern
-            ? "您已成功关注该合伙人"
-            : "您已取消对该合伙人的关注"
-            this.alertText = _text
-            this.alert = true
-            this.isConcern = !this.isConcern
-            setTimeout(() => {
-                this.alert = false
-            }, 1000);
-            // 失败 待补
+            // // 成功
+            // let _text = this.isConcern
+            // ? "您已成功关注该合伙人"
+            // : "您已取消对该合伙人的关注"
+            // this.alertText = _text
+            // this.alert = true
+            // this.isConcern = !this.isConcern
+            // setTimeout(() => {
+            //     this.alert = false
+            // }, 1000);
+            // // 失败 待补
+            
         },
         // 收藏
         collect: function () {
-            console.log('collect')
+            let that=this
+            if(!this.concerned){
+                wx.showModal({
+                    title: '提示',
+                    content: '是否关注该合伙人？',
+                    success: function(res) {
+                        if (res.confirm) {
+                         that.collectRequest()
+                        } else if (res.cancel) {
+                        console.log('用户点击取消')
+                        }
+                    }
+                })
+            }else{
+                wx.showModal({
+                    title: '提示',
+                    content: '24小时之内将不能再次关注，是否决定取消？',
+                    success: function(res) {
+                        if (res.confirm) {
+                         that.collectRequest()
+                        } else if (res.cancel) {
+                        console.log('用户点击取消')
+                        }
+                    }
+                })
+            }
+        },
+        collectRequest(){
+            let that= this
+            let params = {}
+            let flag = 0
+            flag = this.concerned ? 4 : 1
+            params.token =this.token
+            params.separate=1
+            params.id=this.info.userid
+            params.type=2
+            params.flag=flag
+            service({
+                url: '/Member/guanzhu',
+                method: 'post',
+                data: params
+            }).then(res => {
+                if(res.status == 1) {
+                that.concerned = !that.concerned
+                wx.showToast({
+                    title: res.msg,
+                    icon: 'success',
+                    duration: 2000
+                })
+                } else if(res.status == -4) {
+                    wx.showModal({
+                        title: '提示',
+                        content: '是否立即提升？',
+                        success: function(r) {
+                            if (r.confirm) {
+                                wx.navigateTo({
+                                    url: '/pages/projectModification/main'
+                                })
+                            } else if (r.cancel) {
+                                 wx.showToast({
+                                    title: res.msg,
+                                    duration: 2000
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+
         },
         // 邀请领头
         leader: function () {
@@ -88,11 +178,29 @@ export default {
         // 邀请路演
         roadshow: function () {
             console.log('roadshow')
-        }
+        },
+        // 底部统一封装
+        baseRequest(type) {
+            let params = {};
+            params.token =this.token;
+            params.separate =1;
+            params.type=type
+            params.nowUserid=this.userid;
+            params.to_userid = this.info.userid;
+            return request({
+                url: "/xiangmu/myxiangmu",
+                method: "post",
+                data: params
+            })
+        },
     },
     components: {
-        Alert
-    }
+        Alert,
+        // MessageBox
+    },
+    created() {
+        console.log(this.$store.getters)
+    },
 }
 </script>
 
