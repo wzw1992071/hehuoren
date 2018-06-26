@@ -1,27 +1,27 @@
 <template>
     <div class="project-card" :class="{gray: gray}" @click="emitEvent">
-        <div class="collect" @click="collect">
+        <div class="collect" @click.stop="collect">
             <img v-if="!collected" src="/static/images/collect.png">
             <img v-if="collected" src="/static/images/collected.png">
         </div>
         <div class="img">
             <img :src="detail&&baseUrl+detail.logo">
             <div class="heat-img" :class="{gray: gray}">
-                <img v-if="heat <= 50" src="/static/images/hot_low.png">
-                <img v-if="heat > 50" src="/static/images/hot_high.png">
+                <img v-if="detail.jdb <= 50" src="/static/images/hot_low.png">
+                <img v-if="detail.jdb > 50" src="/static/images/hot_high.png">
             </div>
         </div>
         <div class="bottom">
             <div class="info">
                 <div class="name">
                     <span>{{detail.title}}</span>
-                    <span>{{classification}}</span>
+                    <span>{{detail.grade_name}}</span>
                 </div>
-                <p class="slogan">{{slogan}}</p>
-                <p class="type">{{type}}</p>
+                <p class="slogan">{{detail.yijuhua}}</p>
+                <p class="type">{{detail.typename+'|'+detail.typenamedetail}}</p>
             </div>
             <div class="mark">
-                <div class="heat"><span>热度：</span><span :class="{hot: heat > 50}">{{heat}}%</span></div>
+                <div class="heat"><span>热度：</span><span :class="{hot: detail.jdb > 50}">{{detail.jdb}}%</span></div>
                 <div class="address">查看项目预期地址</div>
             </div>
         </div>
@@ -32,28 +32,23 @@
     import {mapGetters} from 'vuex'
     export default {
         props: ['gray', 'detail'],
-        data: function () {
-            return {
-                imgUrl: '/static/images/project-test1.png',
-                name: '爆炸鸭脖',
-                classification: '热门类项目',
-                slogan: '好特么好吃',
-                type: '餐饮美食|饮食饮料',
-                heat: 35,
-                collected: false
-            }
-        },
         methods: {
             collect: function () {
-                this.collected = !this.collected
+                this.$emit('handlerFocuse',this.detail)
             },
             emitEvent: function () {
-                console.log(this.detail)
                 this.$emit('handlerClick')
             }
         },
         computed: {
-            ...mapGetters(['baseUrl'])
+            ...mapGetters(['baseUrl']),
+            collected:function(vm){
+                if(vm.detail['guanzhu_css_class']=='yes_guanzhu'){
+                    return true
+                }else{
+                    return false
+                }
+            }
         }
     }
 </script>

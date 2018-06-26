@@ -40,8 +40,8 @@
     </div>
     <div class="item-content">
       <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
-        <div v-for="item in list">
-          <project-card @handlerClick="loadDetail" :detail="item" ></project-card>
+        <div v-for="(item,key,index) in list" v-bind:key="key">
+          <project-card @handlerClick="loadDetail" @handlerFocuse="focuse" :detail="item" ></project-card>
         </div>
       </scroll-view>
     </div>
@@ -68,95 +68,7 @@ export default {
       area: null,
       sort: null,
       title: null,
-      list:[ {
-        "id": "158",
-        "title": "士大夫但是",
-        "description": "胜多负少地方",
-        "logo": "Public/uploadfile/2018/0412/44e5b37a0fcbc3f8bd618a91a81531a3.png",
-        "founder": null,
-        "mobile": "",
-        "team": null,
-        "team_description": "",
-        "xiangmu_dsj": "",
-        "grade": "1",
-        "plan": "",
-        "demand": "",
-        "tutor": "0",
-        "amount": "0",
-        "shares": "0",
-        "count": "100",
-        "Fund_use": "",
-        "other_demand": "",
-        "media": "",
-        "addtime": "1523524002",
-        "updatetime": "0",
-        "status": "1",
-        "backmsg": "",
-        "deleted": "0",
-        "client_ip": "127.0.0.1",
-        "userid": "113",
-        "icon": "",
-        "email": "",
-        "zhiwei": "",
-        "founder_info": "",
-        "video": null,
-        "cz_data": "",
-        "tutor_truename": "",
-        "tutor_icon": "",
-        "tutor_email": "",
-        "tutor_info": "",
-        "area": "510104,,,,",
-        "xiangmu_hy": "31",
-        "xiangmu_hy_detail": "105",
-        "yijuhua": "的三分到手",
-        "jieduan": "1",
-        "imagedata": "",
-        "shopinfo": "",
-        "pingjian": null,
-        "shopcount": "0",
-        "xiangmu_scdy": "",
-        "xiangmu_jzys": "",
-        "xiangmu_syms": "",
-        "plan_shopcount": "0",
-        "plan_shopaddress": "",
-        "xiangmu_gqsz": "",
-        "xiangmu_chuzi": "0",
-        "xiangmu_zonge": "0",
-        "xiangmu_shouyi": "",
-        "xiangmu_tuichu_one": "",
-        "xiangmu_zhengjian": "",
-        "area_jiedao": "0",
-        "plan_shop": "",
-        "fill_number": "0",
-        "shop_hehuo_typeinfo": "",
-        "jingyingzhibiao": "",
-        "xieyi": "",
-        "projectfrom": "自主品牌",
-        "project_index": "1",
-        "jdb": 0,
-        "grade_name": "展示类项目",
-        "grade_color": "green",
-        "guanzhu_css_class": "no_guanzhu",
-        "typename": "餐饮美食",
-        "typenamedetail": "西式快餐",
-        "planshop": {
-          "1": {
-            "shop_area": "锦江区",
-            "shop_jiedao": "成都市锦江区成都锦华万达广场店"
-          }
-        },
-        "daoshi": null,
-        "news": null,
-        "projectpic": null,
-        "dsj": null,
-        "shop": null,
-        "luyan": null,
-        "guquanshezhi": null,
-        "zijinyongtu": null,
-        "yunyingguankong": null,
-        "tuichu_image": null,
-        "laodianxindian": ""
-      }],
+      list:[],
       page: 1,
       /*可选项*/
       selectRules:{
@@ -258,8 +170,10 @@ export default {
         this.sort = target.val
       }
       this.page = 1;
+      this.list = [];
       this.getProjects();
     },
+
     getProjects() {
       let param = {
         separate:1,
@@ -270,6 +184,11 @@ export default {
         title:this.title,
         page:this.page,
       };
+      for(let i in param){
+        if(!param[i]){
+          delete param[i];
+        }
+      }
       getProjects(param,this.token).then(res=>{
         let data = res.data;
         for(let key in this.selectRules){
@@ -277,21 +196,38 @@ export default {
         }
         if(data.resres){
           this.couldLoadMore = true;
-          this.list = this.list.contact(data.resres);
+          let tempList  = this.list;
+          this.list = tempList.concat(data.resres);
+        }else{
+          this.couldLoadMore = false;
         }
       }).catch(error=>{
         console.log(error)
       })
     },
+
     loadmore(){
       if(!this.couldLoadMore) return;
       this.page++;
       this.getProjects();
     },
     loadDetail(){
-       wx.navigateTo({
-         url: '/pages/projectdetails/main?id=1'
-      })
+      if(!this.token){
+        wx.navigateTo({
+          url: '/pages/login/main'
+        })
+      }else{
+        wx.navigateTo({
+          url: '/pages/projectdetails/main?id=1'
+        })
+      }
+    },
+    focuse(item){
+      if(item['guanzhu_css_class'] == 'yes_guanzhu'){
+        item['guanzhu_css_class'] = 'no_guanzhu'
+      }else{
+        item['guanzhu_css_class'] = 'yes_guanzhu'
+      }
     }
   },
   mounted(){
