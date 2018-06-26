@@ -211,14 +211,14 @@ export default {
       this.page++;
       this.getProjects();
     },
-    loadDetail(){
+    loadDetail(item){
       if(!this.token){
         wx.navigateTo({
           url: '/pages/login/main'
         })
       }else{
         wx.navigateTo({
-          url: '/pages/projectdetails/main?id=1'
+          url: '/pages/projectdetails/main?id='+item.id
         })
       }
     },

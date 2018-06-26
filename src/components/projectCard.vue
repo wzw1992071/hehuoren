@@ -37,7 +37,7 @@
                 this.$emit('handlerFocuse',this.detail)
             },
             emitEvent: function () {
-                this.$emit('handlerClick')
+                this.$emit('handlerClick',this.detail)
             }
         },
         computed: {

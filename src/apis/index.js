@@ -35,3 +35,15 @@ export function getProjects(data,token) {
     method:'POST'
   });
 }
+/**
+ *
+ * @param data
+ * @param token
+ */
+export function getProjectDetail(data,token){
+  return service({
+    url:`/xiangmu/show_info?token=${token}`,
+    data,
+    method:'GET'
+  });
+}

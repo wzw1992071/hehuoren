@@ -20,11 +20,17 @@ const request = ({url,method,data}) =>{
           console.log('你已登出，可以取消继续留在该页面或者重新登录')
           return Promise.reject('error')
         } else {
-          resolve(res);
+          if(res.status=='-1'){
+            wx.reLaunch({
+              url: '/pages/login/main'
+            })
+            return Promise.reject('error')
+          }else{
+            resolve(res);
+          }
         }
       },
       fail:function (error) {
-        wx.hideLoading();
         return Promise.reject(error)
       }
     })

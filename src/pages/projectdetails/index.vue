@@ -1,14 +1,14 @@
 <template>
   <div class="inner">
     <div>
-      1
+      <h1 style="text-align: center">{{detail&&detail.title}}</h1>
     </div>
    <div class="describe">
      <p>
       项目描述
      </p>
      <p>
-       十年品牌、造就创业-六大寿司类型，50多种产品。十年品牌、造就创业-六大寿司类型，50多种产品。
+       {{detail&&detail.description}}
      </p>
     </div>
     <ul class="address clear_left_float">
@@ -21,42 +21,42 @@
           点击查看项目预期地址
       </li>
      </ul>
-     <div class="team">
+     <div class="team" v-if="detail&&(detail.founder||detail.daoshi||detail.team)">
        <p>
          团队介绍
        </p>
        <p>
-         啊啊飒飒大家哈士大夫控股以规范
+        {{detail&&detail.team_description}}
        </p>
        <ul>
-         <li class="clear_right_float">
+         <li class="clear_right_float" v-if="detail&&detail.founder">
            创始人
            <div>
-             
+             <img :src="detail&&baseUrl+detail.founder['founder_icon']" alt="">
            </div>
            <div>
-             <p>张金中</p>
-             <p>龙头老大哥</p>
+             <p>{{detail&&detail.founder['founder_xingming']}}</p>
+             <p>{{detail&&detail.founder['founder_description']}}</p>
            </div>
          </li>
-         <li class="clear_right_float">
+         <li class="clear_right_float" v-if="detail&&detail.daoshi">
            顾问导师
            <div>
-             
+             <img :src="detail&&baseUrl+detail.daoshi['daoshi_icon']" alt="">
            </div>
            <div>
-             <p>张金中</p>
-             <p>龙头老大哥</p>
+             <p>{{detail&&detail.daoshi['daoshi_xingming']}}</p>
+             <p>{{detail&&detail.daoshi['daoshi_description']}}</p>
            </div>
          </li>
-         <li class="clear_right_float">
+         <li class="clear_right_float" v-if="detail&&detail.team">
            团队成员
            <div>
-             
+             <img :src="detail&&baseUrl+detail.team['team_icon']" alt="">
            </div>
            <div>
-             <p>张金中</p>
-             <p>龙头老大哥</p>
+             <p>{{detail&&detail.team['team_xingming']}}</p>
+             <p>{{detail&&detail.team['team_description']}}</p>
            </div>
          </li>
        </ul>
@@ -65,40 +65,40 @@
        <p>
          详细信息
        </p>
-       <div class="details-text">
+       <div class="details-text" v-if="detail&&detail.shop">
          <p>
            现有店铺概况
            <span></span>
          </p>
          <p>
-           店铺名称：坎坎坷坷扩
+           店铺名称：{{detail&&detail.shop.shop_name}}
          </p>
          <p>
            <span>
-            店铺总投入：19999999元
+            店铺总投入：{{detail&&detail.shop.shop_zongtouru}}元
            </span>
            <span>
-             从筹备倒运营：90天
-           </span>
-         </p>
-         <p>
-           <span>
-            开业倒盈利时间：100天
-           </span>
-           <span>
-            人均消费：90元
+             从筹备倒运营：{{detail.shop.shop_yunyingzhouqi}}天
            </span>
          </p>
          <p>
            <span>
-            上季度营业总收入:100000000元
+            开业倒盈利时间：{{detail.shop.shop_fenhongshijian}}天
            </span>
            <span>
-            上年营业净利润:100000元
+            人均消费：{{detail.shop.shop_renjunxiaofei}}元
            </span>
          </p>
          <p>
-            店铺地址：天赋广场
+           <span>
+            上季度营业总收入:{{detail.shop.shop_shangjidushouru}}元
+           </span>
+           <span>
+            上年营业净利润:{{detail.shop.shop_shangnianlirun}}元
+           </span>
+         </p>
+         <p>
+            店铺地址：{{detail.shop.shop_address}}
          </p>
          <swiper
             :indicator-dots="indicatorDots"
@@ -397,34 +397,56 @@
 </template>
 
 
-<script>
-export default {
-  data: function() {
-    return {
-      Number1: "12%",
-      Number2: "80%",
-      Number3: "16%",
-      // 轮播
-      indicatorDots: true,
-      indicatorColor: "#fff",
-      indicatorActiveColor: "#FF7803",
-      autoplay: false,
-      interval: 5000,
-      duration: 1000,
-      optionsShow: false,
-      classInfos: [
-        {
-          img: '/static/images/showbanner.jpg'
-         },
-         {
-           img: '/static/images/showbanner.jpg'
-         }
-      ],
-    };
-  },
-  components: {},
-  methods: {}
-};
+<script type="text/ecmascript-6">
+  import {mapGetters} from 'vuex'
+  import {getProjectDetail} from '@/apis/index'
+  export default {
+    data: function () {
+      return {
+        id:null,
+        detail:null,
+
+        Number1: "12%",
+        Number2: "80%",
+        Number3: "16%",
+        // 轮播
+        indicatorDots: true,
+        indicatorColor: "#fff",
+        indicatorActiveColor: "#FF7803",
+        autoplay: false,
+        interval: 5000,
+        duration: 1000,
+        optionsShow: false,
+        classInfos: [
+          {
+            img: '/static/images/showbanner.jpg'
+          },
+          {
+            img: '/static/images/showbanner.jpg'
+          }
+        ],
+      };
+    },
+    components: {},
+    methods: {
+      loadDetail(){
+        getProjectDetail({
+          separate:1,
+          id:this.id
+        },this.token).then(res=>{
+          this.detail = res.data.info;
+          console.log(this.detail)
+        })
+      }
+    },
+    onLoad: function(option){
+      this.id = option.id;
+      this.loadDetail();
+    },
+    computed:{
+      ...mapGetters(['token','baseUrl'])
+    }
+  };
 </script>
 
 <style scoped  lang='less'>
