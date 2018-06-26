@@ -35,10 +35,23 @@ export function getProjects(data,token) {
     method:'POST'
   });
 }
+
+/**
+ * 关注项目
+ * @param data
+ */
+export function focuseProject(data) {
+  return service({
+    url:`/Member/guanzhu`,
+    data,
+    method:'POST'
+  });
+}
 /**
  *
  * @param data
  * @param token
+ * 获取项目详情
  */
 export function getProjectDetail(data,token){
   return service({

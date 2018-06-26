@@ -41,7 +41,7 @@
     <div class="item-content">
       <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
         <div v-for="(item,key,index) in list" v-bind:key="key">
-          <project-card @handlerClick="loadDetail" @handlerFocuse="focuse" :detail="item" ></project-card>
+          <project-card @handlerClick="loadDetail" :detail="item" ></project-card>
         </div>
       </scroll-view>
     </div>
@@ -220,13 +220,6 @@ export default {
         wx.navigateTo({
           url: '/pages/projectdetails/main?id='+item.id
         })
-      }
-    },
-    focuse(item){
-      if(item['guanzhu_css_class'] == 'yes_guanzhu'){
-        item['guanzhu_css_class'] = 'no_guanzhu'
-      }else{
-        item['guanzhu_css_class'] = 'yes_guanzhu'
       }
     }
   },

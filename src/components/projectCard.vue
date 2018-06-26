@@ -30,25 +30,65 @@
 
 <script type="text/ecmascript-6">
     import {mapGetters} from 'vuex'
+    import {focuseProject} from '@/apis/index'
     export default {
         props: ['gray', 'detail'],
+        data(){
+          return {
+            collected:false
+          }
+        },
         methods: {
             collect: function () {
-                this.$emit('handlerFocuse',this.detail)
+              let param = {
+                id:this.detail.id,
+                separate:1,
+                type:1,
+                token:this.token
+              };
+              this.collected?param.flag=4:param.flag=1;
+              focuseProject(param).then(res=>{
+                if (res.status == 1) {
+                  this.collected = !this.collected;
+                  wx.showToast({
+                    title: res.msg,
+                    icon: 'success',
+                    duration: 2000
+                  });
+                } else {
+                  if (res.status == -3) {
+                    wx.showToast({
+                      title: res.msg,
+                      icon: 'none',
+                      duration: 2000
+                    });
+                    return false;
+                  }
+                  if (res.status != -1) {
+                    wx.showModal({
+                      title: '提示',
+                      content: res.msg,
+                      success: function(res) {
+                        if (res.confirm) {
+
+                        } else if (res.cancel) {
+                          console.log('用户点击取消')
+                        }
+                      }
+                    })
+                  }
+                }
+              })
             },
             emitEvent: function () {
                 this.$emit('handlerClick',this.detail)
             }
         },
+        mounted(){
+          this.collected =!!(this.detail.guanzhu_css_class == 'yes_guanzhu');
+        },
         computed: {
-            ...mapGetters(['baseUrl']),
-            collected:function(vm){
-                if(vm.detail['guanzhu_css_class']=='yes_guanzhu'){
-                    return true
-                }else{
-                    return false
-                }
-            }
+            ...mapGetters(['baseUrl','token'])
         }
     }
 </script>
