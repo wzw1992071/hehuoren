@@ -18,9 +18,9 @@
             <p>{{level}}</p>
         </div>
         <div class="opts">
-            <div @click="concern">
+            <div @click="concern" :class='{no_concern: info.guanzhu_css_class != "no_guanzhu"}'>
                 <img src="/static/images/concer.png" alt="">
-                <span>关注</span>
+                <span>{{info.guanzhu_css_class == "no_guanzhu"? "关注" : "已关注"}}</span>
             </div>
             <div @click="roadshow">
                 <img src="/static/images/roadshow.png" alt="">
@@ -36,6 +36,7 @@
             </div>
         </div>
         <div @click="collect" class="collect"><img src="/static/images/collect.png"></div>
+        <Invite v-if="next" :info="infos" @close="close" @invite="invite"></Invite>
     </div>
 
 </div>
@@ -44,6 +45,7 @@
 <script>
 import Alert from '@/components/alert'
 import service from '@/utils/request';
+import Invite from "@/components/Invite";
 // import MessageBox from '@/components/message-box'
 export default {
     props: ["info"],
@@ -61,6 +63,8 @@ export default {
             userid:1,
             // userid: this.$store.getters.userInfo.userid,
             token: this.$store.getters.token,
+            next: false,
+            infos: {},
         }
     },
     methods: {
@@ -75,25 +79,6 @@ export default {
             :wx.reLaunch({
                 url:`/pages/login/main`
             })
-        },
-        // 邀请
-        invite: function () {
-            console.log('invite')
-        },
-        // 关注
-        concern: function () {
-            // // 成功
-            // let _text = this.isConcern
-            // ? "您已成功关注该合伙人"
-            // : "您已取消对该合伙人的关注"
-            // this.alertText = _text
-            // this.alert = true
-            // this.isConcern = !this.isConcern
-            // setTimeout(() => {
-            //     this.alert = false
-            // }, 1000);
-            // // 失败 待补
-            
         },
         // 收藏
         collect: function () {
@@ -167,6 +152,37 @@ export default {
             })
 
         },
+         // 邀请
+        invite: function () {
+            console.log('invite')
+        },
+        // 关注
+        concern: function () {
+            // // 成功
+            // let _text = this.isConcern
+            // ? "您已成功关注该合伙人"
+            // : "您已取消对该合伙人的关注"
+            // this.alertText = _text
+            // this.alert = true
+            // this.isConcern = !this.isConcern
+            // setTimeout(() => {
+            //     this.alert = false
+            // }, 1000);
+            // // 失败 待补
+            console.log(2)
+            let that = this;
+            this.baseRequest(1).then(res => {
+                if (res.status == 1) {
+                    that.infos = Object.assign( {}, { lists: res.reres }, { title: "关注" })
+                    that.next = true;
+                } else if (res.status == -2) {
+                    that.createProject(res.data);
+                } else {
+                    console.log(res)
+                }
+            });
+            
+        },
         // 邀请领头
         leader: function () {
             console.log('leader')
@@ -187,19 +203,35 @@ export default {
             params.type=type
             params.nowUserid=this.userid;
             params.to_userid = this.info.userid;
-            return request({
+            return service({
                 url: "/xiangmu/myxiangmu",
                 method: "post",
                 data: params
             })
         },
+        createProject(msg) {
+            wx.showModal({
+                title: '提示',
+                content: `${msg},是否立刻创建项目`,
+                success: function(res) {
+                    if (res.confirm) {
+                        wx.navigateTo({
+                            url:`/pages/projectData/main`
+                        })
+                    } else if (res.cancel) {
+                        console.log('用户点击取消') 
+                    }
+                }
+            })
+        },
     },
     components: {
         Alert,
+        Invite
         // MessageBox
     },
     created() {
-        console.log(this.$store.getters)
+        console.log(this.info)
     },
 }
 </script>
