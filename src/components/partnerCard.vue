@@ -28,7 +28,10 @@
             </div>
             <div @click="partnership">
                 <img src="/static/images/partnership.png" alt="">
-                <span>合伙经营</span>
+                <!-- <span>合伙经营</span> -->
+                <picker mode='selector' @change="partnership($event)" range-key="name" :range="selectRules['type']">
+                    合伙经营
+                </picker>
             </div>
             <div @click="leader">
                 <img src="/static/images/leader.png" alt="">
@@ -65,6 +68,13 @@ export default {
             token: this.$store.getters.token,
             next: false,
             infos: {},
+            selectRules:{
+                type:[
+                    {name:'股本合伙',val:3},
+                    {name:'消费合伙',val:4}
+                ]
+            }
+               
         }
     },
     methods: {
@@ -158,18 +168,6 @@ export default {
         },
         // 关注
         concern: function () {
-            // // 成功
-            // let _text = this.isConcern
-            // ? "您已成功关注该合伙人"
-            // : "您已取消对该合伙人的关注"
-            // this.alertText = _text
-            // this.alert = true
-            // this.isConcern = !this.isConcern
-            // setTimeout(() => {
-            //     this.alert = false
-            // }, 1000);
-            // // 失败 待补
-            console.log(2)
             let that = this;
             this.baseRequest(1).then(res => {
                 if (res.status == 1) {
@@ -185,15 +183,47 @@ export default {
         },
         // 邀请领头
         leader: function () {
-            console.log('leader')
+            this.baseRequest(5).then(res => {
+                if (res.status == 1) {
+                    this.infos = Object.assign( {}, { lists: res.reres }, { title: "邀请领头" })
+                    this.next = true;
+                } else if (res.status == -2) {
+                    this.createProject(res.data);
+                } else {
+                    console.log(res);
+                }
+            });
         },
         // 邀请合伙
-        partnership: function () {
-            console.log('partnership')
+        partnership: function (event) {
+            let that= this
+            if(!event.mp.detail.value) return false;
+            let index = event.mp.detail.value;
+            let choiceType = this.selectRules.type[index].val
+            let s = choiceType == 3 ? '邀请股本合伙': '邀请消费合伙';
+            this.baseRequest(choiceType).then(res => {
+                if (res.status == 1) {
+                    that.infos = Object.assign( {}, { lists: res.reres }, { title: s })
+                    that.next = true;
+                } else if(res.status == -2) {
+                    that.createProject(res.data)
+                } else {
+                    console.log(res);
+                }
+            });
         },
         // 邀请路演
         roadshow: function () {
-            console.log('roadshow')
+            this.baseRequest(2).then(res => {
+            if (res.status == 1) {
+            this.infos = Object.assign( {}, { lists: res.reres }, { title: "邀请路演" })
+            this.next = true;
+            } else if(res.status == -2) {
+            this.createProject(res.data)
+            } else {
+            console.log(res);
+            }
+      });
         },
         // 底部统一封装
         baseRequest(type) {
