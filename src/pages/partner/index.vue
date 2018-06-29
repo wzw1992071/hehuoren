@@ -10,10 +10,22 @@
             <input type="text" placeholder="搜索你感兴趣的合伙人" v-model="truename" @keypress.enter="search" :confirm="search">
           </div>
           <div class="filter" v-if="!isSearch">
-            <div  @click="select('type_data')">{{texts.type_data}}<img src="/static/images/arrowDown.png"></div>
-            <div  @click="select('worklive')">{{texts.worklive}}<img src="/static/images/arrowDown.png"></div>
+            <!-- <div  @click="select('type_data')">{{texts.type_data}}<img src="/static/images/arrowDown.png"></div> -->
+            <picker mode='selector' @change="bindPickerChange($event,'type_data')" range-key="name" :value="0" :range="selectRules['type_data']">
+              {{texts.type_data}}
+            </picker>
+             <picker mode='selector' @change="bindPickerChange($event,'worklive')" range-key="name" :value="0" :range="selectRules['worklive']">
+              {{texts.worklive}}
+            </picker>
+             <picker mode='selector' @change="bindPickerChange($event,'liveing')" range-key="name" :value="0" :range="selectRules['liveing']">
+              {{texts.liveing}}
+            </picker>
+             <picker mode='selector' @change="bindPickerChange($event,'grade')" range-key="name" :value="0" :range="selectRules['grade']">
+              {{texts.grade}}
+            </picker>
+            <!-- <div  @click="select('worklive')">{{texts.worklive}}<img src="/static/images/arrowDown.png"></div>
             <div  @click="select('liveing')">{{texts.liveing}}<img src="/static/images/arrowDown.png"></div>
-            <div  @click="select('grade')">{{texts.grade}}<img src="/static/images/arrowDown.png"></div>
+            <div  @click="select('grade')">{{texts.grade}}<img src="/static/images/arrowDown.png"></div> -->
           </div>
           <div class="option" @click="toggleOption">
             <img src="/static/images/optionsYellow.png" alt="">
@@ -43,7 +55,6 @@ import mainOption from '@/components/mainOption'
 import partnerCard from '@/components/partnerCard'
 import Alert from '@/components/alert'
 import service from '@/utils/request';
-import optionCard from "@/components/optionCard";
 export default {
   data: function () {
     return {
@@ -52,6 +63,33 @@ export default {
       partners: [],
 
       // searchText: '',
+      selectRules:{
+        grade:[
+          {
+            name:'全部等级',
+            val:null
+          },
+          {
+            name:'一般合伙人',
+            val:1
+          },
+          {
+            name:'认证合伙人',
+            val:2
+          },
+          {
+            name:'经验合伙人',
+            val:3
+          },
+          {
+            name:'机构合伙人',
+            val:4
+          }
+        ],
+        worklive:[],
+        type_data:[],
+        liveing:[]
+      },
       begoodat: null,
       worklive: null,
       liveing: null,
@@ -84,31 +122,10 @@ export default {
   components: {
     mainOption,
     partnerCard,
-    optionCard
   },
   methods: {
-    toggleOption: function () {
-      this.show = !this.show
-    },
-    // 选项卡功能
-    toggleOpt() {
-      this.optShow = !this.optShow;
-    },
-    getVal(key) {
-      let val = this.searchInfos[key];
-      let that=this;
-      this.$data[this.type] = val;
-      this.texts[this.type] = key;
-      this.getPartners();
-      this.toggleOpt();
-    },
     changeSearch: function () {
       let _isSearch = this.isSearch
-      // if(_isSearch) {
-      //   console.log(this.searchInfo)
-      // } else {
-      //   this.isSearch = true
-      // }
       this.isSearch = !_isSearch
     },
     // 搜索
@@ -168,85 +185,81 @@ export default {
       if(page){
         data.page=(page+1)
       }
-
       return service({
         url: url,
         method: "POST",
         data:data
       }).then(res => {
+        let that = this
         if (res.data) {
           let data = res.data;
-          this.infos = data;
+          that.infos = data;
           // this.partners = data.resres;
           if (res.data.resres != null) {
-            if (this.screens == true) {
-              this.partners = [].concat(data.resres);
-              this.screens = false;
+            if (that.screens == true) {
+              that.partners = [].concat(data.resres);
+              that.screens = false;
               document.body.scrollTop = 0;
+              that.creatSelect(res.data)
+
             } else {
-              this.partners = this.partners.concat(data.resres);
+              that.partners = that.partners.concat(data.resres);
+              that.creatSelect(res.data)
             }
           }else{
-              this.partners = []
-              this.screens = false;
+              that.partners = []
+              that.screens = false;
               document.body.scrollTop = 0;
+              that.creatSelect(res.data)
           }
-          this.countPage = res.data.pageData.countPage;
+          that.countPage = res.data.pageData.countPage;
         }
       });
     },
-
-    select(type) {
-      this.type = type;
-      if (type == "grade") {
-        this.options = [
-          "全部等级",
-          "一般合伙人",
-          "认证合伙人",
-          "经验合伙人",
-          "机构合伙人"
-        ];
-        this.optionsTitle = "等级";
-        this.searchInfos = {
-          全部等级: null,
-          一般合伙人: 1,
-          认证合伙人: 2,
-          经验合伙人: 3,
-          机构合伙人: 4
-        };
-      } else if (type == "type_data") {
-        this.searchUtil("type_data", "全部擅长", "typename", "id");
-      } else if (type == "worklive") {
-        this.searchUtil("area", "工作圈", "name", "code");
-      } else if (type == "liveing") {
-        this.searchUtil("area", "生活圈", "name", "code");
-      }
-
-      this.toggleOpt();
-      console.log(this.optShow)
-      this.page = 0
-      this.screens = true
+    creatSelect(data){
+      console.log(data)
+      var that=this;
+      that.selectRules.worklive=[]
+      that.selectRules.type_data=[]
+      that.selectRules.liveing=[]
+      data.area.forEach(item => {
+        that.selectRules.worklive.push({
+          name:item.name,
+          val:item.id
+        })
+        that.selectRules.liveing.push({
+          name:item.name,
+          val:item.id
+        })
+        
+      });
+      data.type_data.forEach(item => {
+        that.selectRules.type_data.push({
+          name:item.typename,
+          val:item.id
+        })
+      });
     },
-    searchUtil(type, title, key, val) {
-      let datas, len;
-      datas = this.infos[type];
-      len = datas.length;
-      this.optionsTitle = title;
-      this.options = [];
-      if (type == "area") {
-        this.options.push("全部地区");
-        this.searchInfos["全部地区"] = null;
-      } else {
-        this.options.push(title);
-        this.searchInfos[title] = null;
+    bindPickerChange(event,type){
+      let index = event.mp.detail.value;
+      let target = this.selectRules[type][index];
+      if(type=='grade'){
+        this.texts[type] = target.name;
+        this.grade = target.val
+      }else if(type=='type_data'){
+        console.log(1)
+        this.texts[type] = target.name;
+        this.type_data = target.id
+      }else if(type=='worklive'){
+        this.texts[type] = target.name;
+        this.worklive = target.code
+      }else if(type=='liveing'){
+        this.texts[type] = target.name;
+        this.liveing = target.val
       }
-      this.searchInfos = {};
-      for (let i = 0; i < len; i++) {
-        let _key = datas[i][key];
-        let _val = datas[i][val];
-        this.options.push(_key);
-        this.searchInfos[_key] = _val;
-      }
+      this.page = 0;
+      this.list = [];
+      this.getPartners();
     },
 
   },
