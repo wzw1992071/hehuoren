@@ -60,3 +60,48 @@ export function getProjectDetail(data,token){
     method:'GET'
   });
 }
+
+/**
+ * 项目操作：领头人
+ * @param data
+ *
+ */
+export function objOpeByLt(data){
+  return service({
+    url:`/xiangmu/touzi`,
+    data,
+    method:'GET'
+  });
+}
+/**
+ *
+ * @param data
+ */
+export function objOpeByOt(data){
+  return service({
+    url:`/xiangmu/cancaltouzi`,
+    data,
+    method:'GET'
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
