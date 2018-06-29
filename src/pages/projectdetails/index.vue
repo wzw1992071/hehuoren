@@ -308,22 +308,22 @@
            </span>
           </li>
           <li>
-            <a href="###">
+            <san @click="luyan">
               <img src="/static/images/luyan.png" alt="">
               报名路演
-            </a>
+            </san>
           </li>
           <li>
-            <a href="###">
+            <span @click="operate">
               <img src="/static/images/hehuoren.png" alt="">
               合伙运营
-            </a>
+            </span>
           </li>
           <li>
-            <a href="###">
+            <span @click="lead">
               <img src="/static/images/lingdao.png" alt="">
               领头
-            </a>
+            </span>
           </li>
         </ul>
       </div>
@@ -334,7 +334,7 @@
 
 <script type="text/ecmascript-6">
   import {mapGetters} from 'vuex'
-  import {getProjectDetail,focuseProject} from '@/apis/index'
+  import {getProjectDetail,focuseProject,objOpeByLt,objOpeByOt} from '@/apis/index'
   export default {
     data: function () {
       return {
@@ -670,7 +670,74 @@
       /**
        * 报名路演
        */
+      luyan(){
 
+      },
+      /**
+       *  运营
+       */
+      operate(){
+        let params = {
+          id:this.id,
+          type:1,
+          token:this.token
+        };
+        if(this.detail.isHeHuoYunYing =='合伙运营'){
+          objOpeByLt(params).then(this.requestCallback);
+        }else if(this.detail.isHeHuoYunYing =='已消费合伙'){
+          params.type = 2;
+          objOpeByOt(params).then(this.requestCallback);
+        }else if(this.detail.isHeHuoYunYing =='已股本合伙'){
+          params.type = 3;
+          objOpeByOt(params).then(this.requestCallback);
+        }
+      },
+      /**
+       * 领头
+       */
+      lead(){
+        let params = {
+          id:this.id,
+          type:1,
+          token:this.token
+        };
+        if(this.detail.isLingTou=='项目领头'){
+          objOpeByLt(params).then(this.requestCallback);
+        }else{
+          objOpeByOt(params).then(this.requestCallback);
+        }
+      },
+      requestCallback(res){
+        if (res.status == 1) {
+          wx.showToast({
+            title: res.msg,
+            icon: 'success',
+            duration: 2000
+          });
+        } else {
+          if (res.status == -3) {
+            wx.showToast({
+              title: res.msg,
+              icon: 'none',
+              duration: 2000
+            });
+            return false;
+          }
+          if (res.status != -1) {
+            wx.showModal({
+              title: '提示',
+              content: res.msg,
+              success: function(res) {
+                if (res.confirm) {
+
+                } else if (res.cancel) {
+                  console.log('用户点击取消')
+                }
+              }
+            })
+          }
+        }
+      }
     },
     mounted(){
       this.collected =!!(this.detail&&this.detail.guanzhu_css_class == 'yes_guanzhu');
