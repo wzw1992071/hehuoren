@@ -7,7 +7,7 @@
             <img v-if="isSearch" src="/static/images/searchActive.png">
           </div>
           <div class="search-con" v-if="isSearch">
-            <input type="text" placeholder="搜索你感兴趣的合伙人" v-model="truename" @keypress.enter="search" :confirm="search">
+            <input type="text" placeholder="搜索你感兴趣的合伙人" v-model="truename" :confirm-type="'搜索'"  @confirm="search">
           </div>
           <div class="filter" v-if="!isSearch">
             <!-- <div  @click="select('type_data')">{{texts.type_data}}<img src="/static/images/arrowDown.png"></div> -->
@@ -132,7 +132,7 @@ export default {
       this.page = 0
       // 判断是否处于搜索状态
       if(_isSearch){
-        如果是点击搜索
+        // 如果是点击搜索
         this.getPartners().then(() => {
           this.isSearch = false;
         });
