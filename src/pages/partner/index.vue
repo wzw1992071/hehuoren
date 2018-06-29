@@ -34,18 +34,15 @@
         <!-- v-for循环 -->
         <!-- <partner-card></partner-card>
         <partner-card></partner-card> -->
-        <div v-for="(item, index) in partners" :key="index">
-          <partner-card :info="item"></partner-card>
+        <div class="item-content">
+          <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
+            <div v-for="(item, index) in partners" :key="index">
+              <partner-card :info="item"></partner-card>
+            </div>
+          </scroll-view>
         </div>
         <!-- 选项 mock层 -->
         <main-option :optionsShow="show" @toggleShow="toggleOption"></main-option>
-        <option-card
-          v-if="optShow"
-          :lists="options"
-          :title="optionsTitle"
-          @close="toggleOpt"
-          @selected="getVal"
-        ></option-card>
     </div>  
    
 </template>
@@ -108,7 +105,7 @@ export default {
         liveing: "生活圈",
         worklive: "工作圈"
       },
-
+      couldLoadMore:false,
       searchInfos: {},
       infos: {},
       type: "",
@@ -130,6 +127,7 @@ export default {
     },
     // 搜索
     search:function(){
+      console.log(1)
       let _isSearch = this.isSearch;
       this.page = 0
       // 判断是否处于搜索状态
@@ -196,6 +194,7 @@ export default {
           that.infos = data;
           // this.partners = data.resres;
           if (res.data.resres != null) {
+            this.couldLoadMore = true;
             if (that.screens == true) {
               that.partners = [].concat(data.resres);
               that.screens = false;
@@ -208,7 +207,7 @@ export default {
             }
           }else{
               that.partners = []
-              that.screens = false;
+              this.couldLoadMore  = false;
               document.body.scrollTop = 0;
               that.creatSelect(res.data)
           }
@@ -261,7 +260,11 @@ export default {
       this.list = [];
       this.getPartners();
     },
-
+    loadmore(){
+      if(!this.couldLoadMore) return;
+      this.page++;
+      this.getPartners();
+    },
   },
   created(){
     this.getPartners();
@@ -345,6 +348,13 @@ export default {
   height: 80rpx;
   font-size: 24rpx;
   color: #999;
+}
+.item-content{
+  position: absolute;
+  top:80rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 </style>
