@@ -143,9 +143,10 @@ export default {
       } else if (/[0-9]/ig.test(truename)) {
         ifmohu = 1;
       }
-      this.$store.getters.token ? data.append('token', this.$store.getters.token):null;
-      let url = `/Index/touziren?separate=1`;
+      let url = '/Index/touziren';
       let data={};
+      data.separate=1
+      data.token=this.$store.getters.token ?this.$store.getters.token:null;
       if(begoodat){
         data.begoodat=begoodat
       }
