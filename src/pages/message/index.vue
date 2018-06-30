@@ -3,27 +3,28 @@
         <user-header></user-header>
         <div>
             <div class="tab">
-                <div>全部消息</div>
-                <div class="active">会员互动</div>
-                <div>系统消息</div>
+                <div :class="{active: active[0]}" @click="getActive(0)">全部消息</div>
+                <div :class="{active: active[1]}" @click="getActive(1)">会员互动</div>
+                <div :class="{active: active[2]}" @click="getActive(2)">系统消息</div>
             </div>
             <div class="options">
-                <div @click="toggleOption('all')"><i :class="{selected: all}"></i><span>全选</span></div>
-                <div @click="toggleOption('onlyRead')"><i :class="{selected: onlyRead}"></i><span>仅显示未读</span></div>
-                <div @click="markRead"><img src="/static/images/mark.png"><span>标记为已读</span></div>
-                <div @click="getDelete"><img src="/static/images/delete.png"><span>删除</span></div>
+                <div @click="toggleOption(msgType, 'no')"><i :class="{selected: all}"></i><span>全选</span></div>
+                <div @click="toggleOption(msgType, 'yes')"><i :class="{selected: onlyRead}"></i><span>仅显示未读</span></div>
+                <div @click="readOrdel('read')"><img src="/static/images/mark.png"><span>标记为已读</span></div>
+                <div @click="readOrdel('del')"><img src="/static/images/delete.png"><span>删除</span></div>
             </div>
             <div class="lists">
-
-                <div v-for="(i, index) in showMessage" :key="index" class="list-item" @click="getSelect(i)">
-                    <div class="select"><i :class="{selected: selects[i]}"></i></div>
-                    <div class="message"><i :class="{read: messages[i].read}"></i></div>
-                    <div class="list-con">
-                        <div :class="{read: messages[i].read}">{{messages[i].title}}</div>
-                        <p>{{messages[i].time}}</p>
+                 <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
+                    <div v-for="(i, index) in showMessage" :key="index" class="list-item" @click="getSelect(i)">
+                        <div  class="select"><i :class="{selected: selects[i]}"></i></div>
+                        <div class="message"><i :class="{read: messages[i].status == 1}"></i></div>
+                        <div class="list-con">
+                            <div :class="{read: messages[i].status == 1}">{{messages[i].title}}</div>
+                            <p>{{messages[i].addtime}}</p>
+                        </div>
+                        <img src="/static/images/arrow.png" class="arrow">
                     </div>
-                    <img src="/static/images/arrow.png" class="arrow">
-                </div>
+                </scroll-view> 
             </div>
         </div>
     </div>
@@ -31,77 +32,121 @@
 
 <script>
 import userHeader from '@/components/userHeader'
-
+import service from '@/utils/request';
 export default {
   data: function () {
     return {
-      all: true,
-      onlyRead: false,
-      showMessage: [],
-      selects: [],
-      messages: [{
-        title: '您的项目有新的【关注】消息',
-        message: '你被关注了',
-        read: false,
-        time: '2018年5月3日23：06',
-        type: 'user'
-      }, {
-        title: '您有新的项目资料【审核】消息',
-        message: '你的审核通过了',
-        read: false,
-        time: '2018年4月12日14:23',
-        type: 'system'
-      }, {
-        title: '你的项目有新的【关注】消息',
-        message: '你被关注了',
-        read: true,
-        time: '2018年3月30日12:00',
-        type: 'user'
-      }]
+        all: true,
+        onlyRead: false,
+        showMessage: [],
+        selects: [],
+        couldLoadMore:false,
+        // messages: [{
+        //     title: '您的项目有新的【关注】消息',
+        //     message: '你被关注了',
+        //     read: false,
+        //     time: '2018年5月3日23：06',
+        //     type: 'user'
+        // }, {
+        //     title: '您有新的项目资料【审核】消息',
+        //     message: '你的审核通过了',
+        //     read: false,
+        //     time: '2018年4月12日14:23',
+        //     type: 'system'
+        // }, {
+        //     title: '你的项目有新的【关注】消息',
+        //     message: '你被关注了',
+        //     read: true,
+        //     time: '2018年3月30日12:00',
+        //     type: 'user'
+        // }],
+        messages:[],
+        active: [true, false, false],
+        msgStatus: '',
+        msgType: 0,
+        msgLen: 0,
+        loading: false,
+        loadings: false,
+        pages:1,
+        contentpage:'',
     }
   },
   components: {
     userHeader
   },
   methods: {
-    getSelect: function (i){
+    getSelect(i){
         let bool = this.selects[i]
         let _selects = [...this.selects]
         _selects.splice(i, 1, !bool)
         this.selects = _selects
     },
-    toggleOption: function (opt) {
-      if (opt == 'all') {
-        this.$data.all = true
-        this.$data.onlyRead = false
-        // this.showMessage = this.messages
-        this.getAll()
-      }
-      if (opt == 'onlyRead') {
-        this.$data.onlyRead = true
-        this.$data.all = false
-        // this.showMessage = this.messages.filter(item => !item.read)
-        let messages = this.$data.messages
-        let array = []
-        for (let i = 0; i < messages.length; i++) {
-          if (!messages[i].read) {
-            array.push(i)
-          }
+    toggleOption(msgtype = this.msgType, status = this.msgStatust) {
+        this.pages = 1
+        this.getMsgs(msgtype, status).then(res => {
+            this.messages = res
+        }).then(() => {
+            this.getAll()
+        })
+        if(status == 'yes') {
+            this.$data.onlyRead = true;
+            this.$data.all = false
+        } else {
+            this.$data.all = true
+            this.$data.onlyRead = false
         }
-        this.$data.showMessage = array
-      }
+      
     },
-    getAll: function () {
+    getAll() {
       let messages = this.messages
       let arr = []
       for (let i = 0, len = messages.length; i < len; i++) {
         arr.push(i)
       }
+      console.log(messages)
       this.showMessage = arr
       this.selects.length = this.messages.length
       this.selects.fill(false)
     },
-    markRead: function () {
+
+    // 信息处理
+    readOrdel: function(type) {
+        let len = this.messages.length
+        let arr = [], ids = '';
+        for(let i = 0; i < len; i++) {
+            if(this.selects[i]){
+            arr.push(this.messages[i].id)
+            }
+        }
+        ids = arr.join(',')
+        if(ids !== '') {
+            service({
+                url: `/member/batch_update?ids=${ids}&type=${type}&token=${this.$store.getters.token}&separate=1`,
+                method: 'get'
+            }).then(res => {
+                let msg
+                if(res.status == 1) {
+                    msg = res.msg?res.msg:res.data
+                    wx.showToast({
+                        title:msg,
+                        duration: 1000
+                    })
+                }
+                this.getMsgs(this.msgType, this.status).then(res => {
+                    this.messages = []
+                    this.messages = this.messages.concat(res)
+                    this.getAll()
+                })
+            })
+        } else {
+            wx.showToast({
+                title:'未选中消息',
+                duration: 1000
+            })
+            console.log('未选择消息')
+        }
+    },
+    markRead() {
         let _selects = this.selects
         let len = _selects.length
         for(let i = 0; i < len; i ++) {
@@ -110,7 +155,7 @@ export default {
             }
         }
     },
-    getDelete: function () {
+    getDelete() {
         let _selects = this.selects
         let len = _selects.length
         for(let i = 0; i < len; i ++) {
@@ -119,10 +164,73 @@ export default {
                 this.getAll()
             }
         }
-    }
+    },
+    getActive(i){
+        this.pages = 1
+        let arr = []
+        arr.length = 3
+        arr.fill(false)
+        arr[i] = true
+        this.active = arr
+        let type = i === 0 ? 5 : i === 1 ? 1 : 2 
+        this.getMsgs(type, this.msgStatus).then(res => {
+            console.log(res)
+            this.messages = res ? res: [];
+        }).then(() => {
+            this.getAll()
+        })
+    },
+    getMsgs(msgtype = this.msgType, status = this.msgStatus){
+        let params={};
+        params.separate=1;
+        params.msgtype=msgtype;
+        params.status_2=status;
+        params.page=this.pages;
+        params.token=this.$store.getters.token;
+        return service({
+            url: "/member/member_my_msg",
+            data: params,
+            method: "post"
+        }).then(res => {
+            if(res.data) {
+                let msgs = res.data.res
+                this.couldLoadMore = msgs?true:false;
+                this.msgType = msgtype
+                this.msgStatus = status
+                this.contentpage = res.data
+                return msgs
+            } else {
+                wx.showToast({
+                    title: res.msg,
+                    duration: 1000
+                })
+            }
+        })
+    },
+    loadmore(){
+        let that =this
+        this.pages++
+        if(this.couldLoadMore){
+            setTimeout(() => {
+                this.getMsgs().then((res)=>{
+                    for(var i = 0 ; i<res.length;i++){
+                        this.messages.push(res[i])
+                    }
+                    that.getAll()
+                })
+            }, 1000);
+        
+        }else {
+        
+        }
+    },
   },
-  created() {
-    this.getAll()
+  mounted() {
+     this.getMsgs(5, 'no').then(res => {
+        this.messages = res
+    }).then(() => {
+        this.getAll()
+    })
   }
 }
 
@@ -266,6 +374,13 @@ export default {
 
 .list-item .message i.read {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAeCAYAAABE4bxTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjQ1MDNFN0E3NTFDMzExRTg5NEZBRjM0MkRFMkVERjQ1IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjQ1MDNFN0E4NTFDMzExRTg5NEZBRjM0MkRFMkVERjQ1Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NDUwM0U3QTU1MUMzMTFFODk0RkFGMzQyREUyRURGNDUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NDUwM0U3QTY1MUMzMTFFODk0RkFGMzQyREUyRURGNDUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7c4Yt1AAAC7klEQVR42sSXa4hMYRjHz57GLWR9UG4plyIpZcYHd+uyKNdll1xyaT/IBwoRSoiiVlFKkkKxrM26pV0ss0tuTeITtQ1RUgi5bpZZ/0f/U4+3M7NnZs45nvo1zznzzpn/+7zP+7zPKYhGo5ZhQ8AOMAl0tIKxVvAA7EokEnf0FwWGoP4gKfet8KwYoq6nE3QKLOYMLoK3oJ3PAn6BzqCEK/BKAgFRKfkyYgyeyM9aMC/gyGwDu0E/MBA0yU3bRb3YmxCW6qXyPzqOFjQYtKffKQRBXZU/1RS0BzwDPUNM5lbln47FYg0gIoIkq7cagz+HIOi9cT0elIugWS6DR4YgaLnLvWG22tayxe/RHwHiAYq5AGbSvwLu0/8tglpUIo8GR3g9ATQGIOY8mEO/DvVHVugTr1O2kfUSrdWcgdg4nyNVpeqbHBnT6Q9w2/YWi5TFH11Wkbrhg5hqUEr/Nifr2M90glqUP1uJmgzq8xBTCebTj3NHuZrdxoNEVA19Of3rcsyZRWqZijINtj08sERFqjjLSJ1VOVNvLFPOgpxIVapI1XpoUS6BMvrSXkzx8kd2FrOVtuQJ/WlMzEy7ySm4TYys5beg7Xp7wsZw93VwEVOqrnuDA34LOgh2sladABVq9z0C3fisGiXmMJNYmrF14IyXP4p4GLMfrKV/E6yg3wssAUPBC/AN9OV3x8EaPv8pGAQWgkJVDHOKkIhZT7+REXFsKThHv7sScwysVA2fnIuPVe5dzUaQjliFEhNnxTatjDOXXXeNfrkx5gtbnASvZ2Q6I80le8fPvWCDx2JWRTJZii3NLfbtUo/u8jC3VKf6T4R+cDabwOY0Z06+VsSaJDYKNNBPakFOlD6Ak2CflzMnn/cwvmL97RLRtsqkezh6bBWlPmAZ/UNtnTl52lymRDMYC2JOCkVY3LaowbJ9X4ONoEtAgprZt383XteTzptrtWoP/pc9B8Od/FkAjrJOFIYsRFbkIViFdvbrHwEGACjXnguerxG+AAAAAElFTkSuQmCC");
+}
+.lists{
+  position: absolute;
+  top:500rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 </style>
 
