@@ -15,8 +15,8 @@
             </div>
             <div class="lists">
                  <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
-                    <div v-for="(i, index) in showMessage" :key="index" class="list-item" @click="getSelect(i)">
-                        <div  class="select"><i :class="{selected: selects[i]}"></i></div>
+                    <div v-for="(i, index) in showMessage" :key="index" class="list-item" @click="goDetail(i)">
+                        <div  class="select" @click="getSelect(i)"><i :class="{selected: selects[i]}"></i></div>
                         <div class="message"><i :class="{read: messages[i].status == 1}"></i></div>
                         <div class="list-con">
                             <div :class="{read: messages[i].status == 1}">{{messages[i].title}}</div>
@@ -75,6 +75,7 @@ export default {
     userHeader
   },
   methods: {
+      
     getSelect(i){
         let bool = this.selects[i]
         let _selects = [...this.selects]
@@ -224,6 +225,18 @@ export default {
         
         }
     },
+    goDetail(i){
+        let that=this;
+        let msg =this.messages[i]
+        service({
+            url: `/member/batch_update?ids=${msg.id}&type=read&token=${that.$store.getters.token}&separate=1`,
+            method: 'get'
+        }).then(res => {
+            wx.navigateTo({
+                url: `/pages/messageDetail/main?msg=${msg.content}&id=${msg.contentid}&type=${msg.from_userid}`
+            })
+        })
+    }
   },
   mounted() {
      this.getMsgs(5, 'no').then(res => {

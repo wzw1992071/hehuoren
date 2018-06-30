@@ -24,6 +24,7 @@ export default {
       'pages/user/main', // 个人中心
       'pages/advise/main', // 我要吐槽
       'pages/message/main', // 消息
+      'pages/messageDetail/main', // 消息详情
       'pages/project/main', // 我的项目
       'pages/projectData/main', // 创建项目
       'pages/manual/main', // 手册
