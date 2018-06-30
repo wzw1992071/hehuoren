@@ -377,7 +377,7 @@ export default {
 }
 .lists{
   position: absolute;
-  top:500rpx;
+  top:580rpx;
   left: 0;
   right: 0;
   bottom: 0;
