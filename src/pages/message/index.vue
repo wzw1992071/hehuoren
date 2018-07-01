@@ -104,7 +104,6 @@ export default {
       for (let i = 0, len = messages.length; i < len; i++) {
         arr.push(i)
       }
-      console.log(messages)
       this.showMessage = arr
       this.selects.length = this.messages.length
       this.selects.fill(false)

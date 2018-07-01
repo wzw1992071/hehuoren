@@ -9,7 +9,7 @@
         完善资料可获得更多合伙人青睐及达成合伙意向
       </p>
       <p>
-        当前项目等级：一般合火人
+        当前项目等级：{{userInfo.gradeName}}
       </p>
     </div>
     <ul class="show-list">
@@ -21,7 +21,7 @@
           <p>
             {{item.text}}
           </p>
-          <img :src="item.icon">
+          <img :src="item.icon" @click="getEvent(item.event, item.grade)">
         </a>
       </li>
     </ul>
@@ -31,7 +31,8 @@
 
 <script>
 import userHeader from "@/components/userHeader";
-
+import {mapGetters} from "vuex";
+import service from '@/utils/request';
 export default {
   data: function() {
     return {
@@ -40,35 +41,58 @@ export default {
           name: "一般合伙人",
           text: "生活圈、工作圈、文化程度...",
           icon: "/static/images/icon_xie.png",
-          eventParam: "###"
+          event: "/generalPartner",
+          grade: 1
         },
         {
           name: "认证合伙人",
           text: "可提供附加值、擅长领域...",
           icon: "/static/images/icon_xie.png",
-          eventParam: "###"
+          event: "/certifiedPartner",
+          grade: 2
         },
         {
           name: "经验合伙人",
           text: "固定资产证明、收入证明...",
           icon: "/static/images/icon_xie.png",
-          eventParam: "###"
+          event: "/experiencePartner",
+          grade: 3
         },
         {
           name: "机构合伙人",
           text: "机构资产证明、机构净利润证明...",
           icon: "/static/images/icon_xie.png",
-          eventParam: "###"
+          event: "/institutionalPartners",
+          grade: 4
         },
         
       ]
     };
   },
+  computed: {
+      ...mapGetters(['userInfo', 'token']),
+    },
   components: {
     userHeader
   },
   methods: {
-  }
+    getEvent: function(_path, grade) {
+      service({
+        url: `/member/member_conf?separate=1&gopage=${grade}&token=${this.token}`,
+        method: 'get'
+      }).then(res => {
+        wx.setStorage({
+          key:`hehuoren_form_${grade}`,
+          data:JSON.stringify(res.data)
+        })
+        wx.navigateTo({
+          url: `/pages${_path}/main`
+        })
+      })
+    }
+  },
+  mounted() {
+  },
 };
 </script>
 

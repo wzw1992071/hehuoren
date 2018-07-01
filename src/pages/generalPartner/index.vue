@@ -49,10 +49,7 @@ import modifyInput from '@/components/modifyInput'
 export default {
   data: function() {
     return {
-      avatar: {
-          title: '*本人头像',
-          tip: '将出现在个人中心及一些其他列表中.清晰的头像能提高您的诚信度.支持JPG,PNG格式,不大于5MB'
-      },
+      
       inputsOne: {
           type: 3,
           title: '*生活圈',
@@ -123,8 +120,45 @@ export default {
     inputs,
     modifyInput
   },
+  computed:{
+    avatar(){
+      let a ={
+          title: '*本人头像',
+          tip: '将出现在个人中心及一些其他列表中.清晰的头像能提高您的诚信度.支持JPG,PNG格式,不大于5MB',
+          imgSrc:''
+      }
+      // wx.getStorageSync({
+      //   key: 'hehuoren_form_1',
+      //   success: function(res) {
+      //     console.log(res.data)
+          // a.imgSrc = JSON.parse(res.data).info.icon
+      //   } 
+      // })
+      a.imgSrc = JSON.parse(wx.getStorageSync('hehuoren_form_1')).info.icon
+      // console.log(JSON.parse(wx.getStorageSync('hehuoren_form_1')))
+      return a ;
+    },
+    formData(){
+      wx.getStorage({
+        key: 'hehuoren_form_1',
+        success: function(res) {
+          // console.log(JSON.parse(res.data))
+          return JSON.parse(res.data)
+        } 
+      })
+    }
+  },
   methods: {
-  }
+  },
+  mounted() {
+    let that =this
+    wx.getStorage({
+      key: 'hehuoren_form_1',
+      success: function(res) {
+        that.avatar.imgSrc = JSON.parse(res.data).info.icon
+      } 
+    })
+  },
 };
 </script>
 

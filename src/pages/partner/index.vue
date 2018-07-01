@@ -127,7 +127,6 @@ export default {
     },
     // 搜索
     search:function(){
-      console.log(1)
       let _isSearch = this.isSearch;
       this.page = 0
       // 判断是否处于搜索状态
@@ -216,7 +215,6 @@ export default {
       });
     },
     creatSelect(data){
-      console.log(data)
       var that=this;
       that.selectRules.worklive=[]
       that.selectRules.type_data=[]
