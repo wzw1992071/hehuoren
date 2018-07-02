@@ -626,6 +626,7 @@
           }
         }
       },
+
       remindMessaage(message, reqtype){
         let self = this;
         wx.showModal({

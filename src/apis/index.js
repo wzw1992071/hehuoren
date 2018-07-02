@@ -86,7 +86,7 @@ export function objOpeByOt(data){
 }
 
 /**
- * send_project_sms asag
+ * send_project_sms
  * @param data
  */
 export function sendProjectSms(data){
