@@ -32,7 +32,7 @@
                 <div class="tips" v-if="isMessage?true:false">
                   未读：{{userInfo.no_read ? user.no_read : 0}}条 总计：{{tips.total}}条
                 </div>
-                <div v-if="isMessage?false:true" class="user-login">
+                <div v-if="isMessage?false:true" class="user-login" @click="userUpdate">
                     <img :src="levelImg" class="levelImg">
                     <div>{{levelInfo}}</div>
                 </div>
@@ -74,6 +74,11 @@
       login() {
         wx.navigateTo({
           url: '/pages/login/main'
+        })
+      },
+      userUpdate(){
+        wx.navigateTo({
+            url: '/pages/projectModification/main'
         })
       },
       setTimes(){

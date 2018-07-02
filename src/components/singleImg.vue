@@ -11,8 +11,9 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
 export default {
-    props: ['info'],
+  props: ['info'],
   data: function() {
     return {
       title: '',
@@ -21,6 +22,9 @@ export default {
     };
   },
   components: {},
+  computed: {
+    ...mapGetters(['baseUrl']),
+  },
   methods: {
     getImg() {
       wx.chooseImage({
@@ -40,6 +44,8 @@ export default {
   },
   created() {
       let _info = this.info
+      // console.log(_info)
+      // console.log(_info.imgSrc)
       if(_info) {
           this.title = _info.title
           ? _info.title
@@ -47,7 +53,11 @@ export default {
           this.tip = _info.tip
           ? _info.tip
           : this.tip
+          this.img = _info.imgSrc
+          ? this.baseUrl+_info.imgSrc
+          : this.img
       }
+      console.log(this.img)
   }
 };
 </script>
