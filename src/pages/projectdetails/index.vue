@@ -1,30 +1,77 @@
 <template>
   <div class="inner">
-   <div class="describe">
-     <p>
-      项目描述
-     </p>
-     <p>
-       {{detail&&detail.description}}
-     </p>
+    <div class="con" v-if="detail">
+      <div class="project-card">
+        <div class="img">
+          <img class="project-card-logo" :src="baseUrl+detail.logo" alt="">
+          <div class="heat-img">
+            <img src="/static/images/hot_low.png">
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="info">
+            <div class="name">
+              <span>{{detail.title}}</span>
+              <span class="zhanshilei" v-if="detail.grade==1">展示类</span>
+              <span class="yurelei" v-if="detail.grade==2">预热类</span>
+              <span class="remenlei" v-if="detail.grade==3">热门类</span>
+              <span class="luyanlei" v-if="detail.grade==4">准路演类</span>
+              <span class="red" v-if="jieduan==1">首次开店</span>
+              <span class="red" v-if="jieduan==2">开设分店</span>
+              <span class="red" v-if="jieduan==3">老店重组</span>
+            </div>
+            <p class="slogan oneover">{{detail.yijuhua}}</p>
+            <p class="type onetwo">{{detail.xiangmu_hy_name}}</p>
+          </div>
+          <div class="mark">
+            <div class="heat">
+              <span>热度：</span>
+              <span class='hot'>{{detail.guanzhu_count}}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <ul class="address clear_left_float">
-      <li>
-          <img src="/static/images/gps.jpg" alt="">
-          点击查看项目预期地址
-      </li>
-      <li>
-          <img src="/static/images/gps.jpg" alt="">
-          点击查看项目预期地址
-      </li>
-     </ul>
+
+    <div class="describe block">
+      <h1>
+        <span>项目描述</span>
+        <span>
+          <img src="/static/images/h1close.png">
+          <img src="/static/images/h1open.png">
+        </span>
+      </h1>
+      <div>
+        <p v-if="detail"> {{detail.description}} </p>
+        <ul class="address clear_left_float">
+          <li>
+            <img src="/static/images/gps.jpg">
+            <span>项目预期地址</span>
+          </li>
+          <li>
+            <img src="/static/images/liebiao.png">
+            <span>项目分布列表</span>
+          </li>
+          <li>
+            <img src="/static/images/gps.jpg">
+            <span>合伙人预期地址</span>
+          </li>
+          <li>
+            <img src="/static/images/liebiao.png">
+            <span>合伙人分布列表</span>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
      <div class="team" v-if="detail&&(detail.founder||detail.daoshi||detail.team)">
-       <p>
-         团队介绍
-       </p>
-       <p>
-        {{detail&&detail.team_description}}
-       </p>
+       <h1 class="title">
+        <span>团队介绍</span>
+       </h1>
+       <div>
+         <p>{{detail&&detail.team_description}}</p>
+       </div>
        <ul>
          <li class="clear_right_float" v-if="detail&&detail.founder">
            创始人
@@ -58,6 +105,8 @@
          </li>
        </ul>
      </div>
+
+
      <div class="details" v-if="detail&&(detail.shop||detail.xiangmu_scdy||detail.xiangmu_jzys||detail.xiangmu_syms||detail.pingjian||detail.dsj)">
        <p>
          详细信息
@@ -340,9 +389,14 @@
       return {
         id:null,
         detail:null,
-        hehuoLog:null,
+        hehuoLog:{
+          "other_count": 0,
+          "min_count": 0,
+          "max_count": 0
+        },
         collected:false,
-
+        hehuos:false,
+        jieduan: 0,
       };
     },
     components: {},
@@ -351,268 +405,413 @@
         getProjectDetail({
           separate:1,
           id:this.id
-        },this.token).then(res=>{
+        },this.token).then(resxx=>{
+          let res = {
+            data:{
+              "jieduan": {
+                "1": "首次开店",
+                "2": "开设分店",
+                "3": "老店重组"
+              },
+              "city": [
+                {
+                  "code": "锦江区",
+                  "area": "510104",
+                  "name": "锦江区"
+                },
+                {
+                  "code": "青羊区",
+                  "area": "510105",
+                  "name": "青羊区"
+                },
+                {
+                  "code": "金牛区",
+                  "area": "510106",
+                  "name": "金牛区"
+                },
+                {
+                  "code": "武侯区",
+                  "area": "510107",
+                  "name": "武侯区"
+                },
+                {
+                  "code": "成华区",
+                  "area": "510108",
+                  "name": "成华区"
+                },
+                {
+                  "code": "龙泉驿区",
+                  "area": "510112",
+                  "name": "龙泉驿区"
+                },
+                {
+                  "code": "青白江区",
+                  "area": "510113",
+                  "name": "青白江区"
+                },
+                {
+                  "code": "新都区",
+                  "area": "510114",
+                  "name": "新都区"
+                },
+                {
+                  "code": "温江区",
+                  "area": "510115",
+                  "name": "温江区"
+                },
+                {
+                  "code": "金堂县",
+                  "area": "510121",
+                  "name": "金堂县"
+                },
+                {
+                  "code": "双流县",
+                  "area": "510122",
+                  "name": "双流县"
+                },
+                {
+                  "code": "郫县",
+                  "area": "510124",
+                  "name": "郫县"
+                },
+                {
+                  "code": "大邑县",
+                  "area": "510129",
+                  "name": "大邑县"
+                },
+                {
+                  "code": "蒲江县",
+                  "area": "510131",
+                  "name": "蒲江县"
+                },
+                {
+                  "code": "新津县",
+                  "area": "510132",
+                  "name": "新津县"
+                },
+                {
+                  "code": "都江堰市",
+                  "area": "510181",
+                  "name": "都江堰市"
+                },
+                {
+                  "code": "彭州市",
+                  "area": "510182",
+                  "name": "彭州市"
+                },
+                {
+                  "code": "邛崃市",
+                  "area": "510183",
+                  "name": "邛崃市"
+                },
+                {
+                  "code": "崇州市",
+                  "area": "510184",
+                  "name": "崇州市"
+                },
+                {
+                  "code": "高新区",
+                  "area": "510185",
+                  "name": "高新区"
+                },
+                {
+                  "code": "锦江区",
+                  "area": "510108",
+                  "name": "锦江区"
+                }
+              ],
+              "planshopAddress": {
+                "1": {
+                  "shop_area": "锦江区",
+                  "shop_jiedao": "成都市锦江区成都锦华万达广场店",
+                  "jiedaolist": false
+                },
+                "2": {
+                  "shop_area": "青羊区",
+                  "shop_jiedao": "成都市青羊区成都青羊万达广场",
+                  "jiedaolist": false
+                },
+                "3": {
+                  "shop_area": "金牛区",
+                  "shop_jiedao": "成都市金牛区成都金牛万达广场甲级写字楼-a座",
+                  "jiedaolist": false
+                },
+                "4": {
+                  "shop_area": "武侯区",
+                  "shop_jiedao": "成都市武侯区武侯万达广场",
+                  "jiedaolist": false
+                }
+              },
+              "info": {
+                "id": "158",
+                "title": "项目名称",
+                "description": "项目介绍",
+                "logo": "Public/uploadfile/2018/0412/44e5b37a0fcbc3f8bd618a91a81531a3.png",
+                "founder": {
+                  "founder_icon": "Public/uploadfile/2018/0413/5fc915ee7834f0849ce0cd4c5b6ea3df.png",
+                  "founder_xingming": "创始人真实姓名",
+                  "founder_mobile": "13555555555",
+                  "founder_weixin": "创始人微信号",
+                  "founder_zhiwei": "技术负责人",
+                  "founder_description": "创始人个人描述"
+                },
+                "mobile": "",
+                "team": {
+                  "1": {
+                    "team_icon": "Public/uploadfile/2018/0413/e0808072b51d6ddbfe4dad8730069c69.png",
+                    "team_xingming": "团队其他成员信息真实姓名一",
+                    "team_mobile": "13555555555",
+                    "team_weixin": "团队其他成员信息微信号一",
+                    "team_zhiwei": "市场负责人",
+                    "team_description": "团队其他成员信息个人描述一"
+                  },
+                  "2": {
+                    "team_icon": "Public/uploadfile/2018/0507/3df357ed56cad2b21871df009242aa60.png",
+                    "team_xingming": "团队其他成员信息真实姓名二",
+                    "team_mobile": "13222222222",
+                    "team_weixin": "团队其他成员信息微信号二",
+                    "team_zhiwei": "技术负责人",
+                    "team_description": "团队其他成员信息个人描述二"
+                  }
+                },
+                "team_description": "团队介绍",
+                "xiangmu_dsj": "",
+                "grade": "4",
+                "plan": "",
+                "demand": "",
+                "tutor": "0",
+                "amount": "0",
+                "shares": "0",
+                "count": "100",
+                "Fund_use": "",
+                "other_demand": "",
+                "media": "",
+                "addtime": "1523524002",
+                "updatetime": "1525664169",
+                "status": "1",
+                "backmsg": "",
+                "deleted": "0",
+                "client_ip": "127.0.0.1",
+                "userid": "113",
+                "icon": "",
+                "email": "",
+                "zhiwei": "",
+                "founder_info": "",
+                "video": {
+                  "1": {
+                    "video_title": "项目视频标题一",
+                    "video_href": "http://www.xiangmuspyi.com"
+                  },
+                  "2": {
+                    "video_title": "项目视频标题二",
+                    "video_href": "http://www.xiangmusper.com"
+                  }
+                },
+                "cz_data": "",
+                "tutor_truename": "",
+                "tutor_icon": "",
+                "tutor_email": "",
+                "tutor_info": "",
+                "area": "510104,510105,510106,510107,",
+                "xiangmu_hy": "31",
+                "xiangmu_hy_detail": "105",
+                "yijuhua": "一句话介绍",
+                "jieduan": "1",
+                "imagedata": "",
+                "shopinfo": "",
+                "pingjian": {
+                  "pingjian_address": "项目评鉴店铺位置",
+                  "pingjian_mobile": "0827-6613240",
+                  "pingjian_lianxiren": "项目评鉴联系人姓名",
+                  "pingjian_sales": "2.5"
+                },
+                "shopcount": "0",
+                "xiangmu_scdy": "竞争模式市场调研",
+                "xiangmu_jzys": "竞争模式竞争优势",
+                "xiangmu_syms": "竞争模式商业优势",
+                "plan_shopcount": "0",
+                "plan_shopaddress": "",
+                "xiangmu_gqsz": "",
+                "xiangmu_chuzi": "0",
+                "xiangmu_zonge": "0",
+                "xiangmu_shouyi": "",
+                "xiangmu_tuichu_one": "路演退出机制",
+                "xiangmu_zhengjian": "",
+                "area_jiedao": "0",
+                "plan_shop": "",
+                "fill_number": "0",
+                "shop_hehuo_typeinfo": "",
+                "jingyingzhibiao": "",
+                "xieyi": "",
+                "projectfrom": "自主品牌",
+                "project_index": "17",
+                "planshop": {
+                  "1": {
+                    "shop_area": "锦江区",
+                    "shop_jiedao": "成都市锦江区成都锦华万达广场店"
+                  },
+                  "2": {
+                    "shop_area": "青羊区",
+                    "shop_jiedao": "成都市青羊区成都青羊万达广场"
+                  },
+                  "3": {
+                    "shop_area": "金牛区",
+                    "shop_jiedao": "成都市金牛区成都金牛万达广场甲级写字楼-a座"
+                  },
+                  "4": {
+                    "shop_area": "武侯区",
+                    "shop_jiedao": "成都市武侯区武侯万达广场"
+                  }
+                },
+                "daoshi": {
+                  "1": {
+                    "daoshi_icon": "Public/uploadfile/2018/0413/b539c757dbf6761074d4a2dfa69e0d65.png",
+                    "daoshi_xingming": "顾问导师姓名一",
+                    "daoshi_zhiwei": "技术顾问",
+                    "daoshi_description": "顾问导师简介一"
+                  },
+                  "2": {
+                    "daoshi_icon": "Public/uploadfile/2018/0413/4c344c16f6e92db2998867581435f59e.png",
+                    "daoshi_xingming": "顾问导师姓名二",
+                    "daoshi_zhiwei": "技术顾问",
+                    "daoshi_description": "顾问导师简介二"
+                  }
+                },
+                "news": {
+                  "1": {
+                    "news_title": "新闻报道标题一",
+                    "news_href": "http://www.xinwenyi.com"
+                  },
+                  "2": {
+                    "news_title": "新闻报道标题二",
+                    "news_href": "http://www.xinwener.com"
+                  }
+                },
+                "projectpic": {
+                  "1": {
+                    "project_img": "Public/uploadfile/2018/0507/b2c2d9da85c65e546fe0ae4b6084ee36.png"
+                  },
+                  "2": {
+                    "project_img": "Public/uploadfile/2018/0507/b21ad62ea401cabc2b4aa7ae268ffeaa.png"
+                  }
+                },
+                "dsj": {
+                  "1": {
+                    "dsj_time": "2018年5月6日",
+                    "dsj_content": "2018年5月6日我公司发生了意见项目大事记，这是事件类容一"
+                  },
+                  "2": {
+                    "dsj_time": "2018年5月7日",
+                    "dsj_content": "2018年5月7日我公司发生了意见项目大事记，这是事件类容二"
+                  }
+                },
+                "shop": {
+                  "1": {
+                    "shop_name": "现有店铺名称",
+                    "shop_address": "现有店铺名称地址",
+                    "shop_zongtouru": "99999999999999999999",
+                    "shop_yunyingzhouqi": "360",
+                    "shop_fenhongshijian": "90",
+                    "shop_keliuliang": "500",
+                    "shop_renjunxiaofei": "50",
+                    "shop_shangnianshouru": "9000000",
+                    "shop_shangnianlirun": "6200000",
+                    "shop_shangjidushouru": "2250000",
+                    "shop_shangjidulirun": "900000"
+                  }
+                },
+                "luyan": {
+                  "luyan": "是",
+                  "jihuashu": "是",
+                  "chouhuazhouqi": "1个月",
+                  "luyanchangdi": "有",
+                  "shuomingren": "核心团队成员",
+                  "ishelp": "是"
+                },
+                "guquanshezhi": {
+                  "project_shoptype": "新店开设",
+                  "project_shopmianji": "360",
+                  "project_zongtouru": "5000000",
+                  "project_xiangmufang_chuzi": "3000000",
+                  "project_xiangmufang_gufen": "40",
+                  "project_hehuofang_chuzi": "2000000",
+                  "project_hehuofang_gufen": "60",
+                  "project_xiangmufang_shouyi": "40",
+                  "project_hehuofang_shouyi": "60",
+                  "project_xfhh_danbi": "300",
+                  "project_xfhh_gufen": "200",
+                  "project_xfhh_count": "500",
+                  "project_xfhh_tiyanmoney": "44",
+                  "project_gbhh_danbi": "220",
+                  "project_gbhh_gufen": "44",
+                  "project_gbhh_count": "44",
+                  "project_gbhh_tiyanmoney": "55",
+                  "project_lthh_danbi": "45",
+                  "project_lthh_gufen": "51",
+                  "project_lthh_count": "5",
+                  "project_lthh_tiyanmoney": "445",
+                  "project_other_shouyi": "路演股权设置",
+                  "guzhiyiju_img": ""
+                },
+                "zijinyongtu": {
+                  "zjyt_jiameng": "否",
+                  "zjyt_yufuzujin": "60000",
+                  "zjyt_lvyuebaozhengjin": "12000",
+                  "zjyt_peixunfei_money": "3000",
+                  "zjyt_peixunfei_mouth": "13",
+                  "zjyt_peixunfei_allmoney": "4444",
+                  "zjyt_gongzi_money": "4242",
+                  "zjyt_gongzi_mouth": "424",
+                  "zjyt_gongzi_allmoney": "424",
+                  "zjyt_zhuangxiu": "4242",
+                  "zjyt_yuanliao": "24525",
+                  "zjyt_chengligongsi": "2424",
+                  "zjyt_liudongzijin": "42474",
+                  "zjyt_chubeijin": "42474",
+                  "zjyt_guanggao": "354",
+                  "zjyt_caiwu": "4242",
+                  "zjyt_allmoney": "197603",
+                  "zjyt_remark": "路演资金用途"
+                },
+                "yunyingguankong": {
+                  "yygk_kaidianshijian": "23",
+                  "yygk_maolilv": "44",
+                  "yygk_fenhongshijian": "24",
+                  "yygk_gudongguanli": "路演运营管控，合伙人管理办法及要求",
+                  "yygk_zijinjianguan": "路演运营管控，资金监管",
+                  "yygk_agree": "同意"
+                },
+                "tuichu_image": {
+                  "1": {
+                    "xieyi_img": "Public/uploadfile/2018/0507/300436bf3ce98b6e26ba7dd901898ada.png"
+                  }
+                },
+                "luyan_jdt": 0,
+                "guanzhu_count": "0",
+                "order_count": "0",
+                "isGuanZhu": "关注",
+                "isLingTou": "项目领头",
+                "isHeHuoYunYing": "合伙运营",
+                "hehuo_tp": 0,
+                "isLuYan": "报名路演",
+                "xiangmu_hy_name": "餐饮美食"
+              },
+              "hehuoLog": {
+                "other_count": 0,
+                "min_count": 0,
+                "max_count": 0
+              },
+              "other_res": [],
+              "resList": [],
+              "resList2": [],
+              "is_login": 0,
+              "userinfo": null,
+              "userGrade": null
+            }
+          }
           this.detail = res.data.info;
+          if (detail) this.jieduan = detail.jieduan ? detail.jieduan : 0;
           this.hehuoLog = res.data.hehuoLog;
-//          this.detail = {
-//            "id": "158",
-//            "title": "项目名称",
-//            "description": "项目介绍",
-//            "logo": "Public/uploadfile/2018/0412/44e5b37a0fcbc3f8bd618a91a81531a3.png",
-//            "founder": {
-//              "founder_icon": "Public/uploadfile/2018/0413/5fc915ee7834f0849ce0cd4c5b6ea3df.png",
-//              "founder_xingming": "创始人真实姓名",
-//              "founder_mobile": "13555555555",
-//              "founder_weixin": "创始人微信号",
-//              "founder_zhiwei": "技术负责人",
-//              "founder_description": "创始人个人描述"
-//            },
-//            "mobile": "",
-//            "team": {
-//              "1": {
-//                "team_icon": "Public/uploadfile/2018/0413/e0808072b51d6ddbfe4dad8730069c69.png",
-//                "team_xingming": "团队其他成员信息真实姓名一",
-//                "team_mobile": "13555555555",
-//                "team_weixin": "团队其他成员信息微信号一",
-//                "team_zhiwei": "市场负责人",
-//                "team_description": "团队其他成员信息个人描述一"
-//              },
-//              "2": {
-//                "team_icon": "Public/uploadfile/2018/0507/3df357ed56cad2b21871df009242aa60.png",
-//                "team_xingming": "团队其他成员信息真实姓名二",
-//                "team_mobile": "13222222222",
-//                "team_weixin": "团队其他成员信息微信号二",
-//                "team_zhiwei": "技术负责人",
-//                "team_description": "团队其他成员信息个人描述二"
-//              }
-//            },
-//            "team_description": "团队介绍",
-//            "xiangmu_dsj": "",
-//            "grade": "4",
-//            "plan": "",
-//            "demand": "",
-//            "tutor": "0",
-//            "amount": "0",
-//            "shares": "0",
-//            "count": "100",
-//            "Fund_use": "",
-//            "other_demand": "",
-//            "media": "",
-//            "addtime": "1523524002",
-//            "updatetime": "1525664169",
-//            "status": "1",
-//            "backmsg": "",
-//            "deleted": "0",
-//            "client_ip": "127.0.0.1",
-//            "userid": "113",
-//            "icon": "",
-//            "email": "",
-//            "zhiwei": "",
-//            "founder_info": "",
-//            "video": {
-//              "1": {
-//                "video_title": "项目视频标题一",
-//                "video_href": "http://www.xiangmuspyi.com"
-//              },
-//              "2": {
-//                "video_title": "项目视频标题二",
-//                "video_href": "http://www.xiangmusper.com"
-//              }
-//            },
-//            "cz_data": "",
-//            "tutor_truename": "",
-//            "tutor_icon": "",
-//            "tutor_email": "",
-//            "tutor_info": "",
-//            "area": "510104,510105,510106,510107,",
-//            "xiangmu_hy": "31",
-//            "xiangmu_hy_detail": "105",
-//            "yijuhua": "一句话介绍",
-//            "jieduan": "1",
-//            "imagedata": "",
-//            "shopinfo": "",
-//            "pingjian": {
-//              "pingjian_address": "项目评鉴店铺位置",
-//              "pingjian_mobile": "0827-6613240",
-//              "pingjian_lianxiren": "项目评鉴联系人姓名",
-//              "pingjian_sales": "2.5"
-//            },
-//            "shopcount": "0",
-//            "xiangmu_scdy": "竞争模式市场调研",
-//            "xiangmu_jzys": "竞争模式竞争优势",
-//            "xiangmu_syms": "竞争模式商业优势",
-//            "plan_shopcount": "0",
-//            "plan_shopaddress": "",
-//            "xiangmu_gqsz": "",
-//            "xiangmu_chuzi": "0",
-//            "xiangmu_zonge": "0",
-//            "xiangmu_shouyi": "",
-//            "xiangmu_tuichu_one": "路演退出机制",
-//            "xiangmu_zhengjian": "",
-//            "area_jiedao": "0",
-//            "plan_shop": "",
-//            "fill_number": "0",
-//            "shop_hehuo_typeinfo": "",
-//            "jingyingzhibiao": "",
-//            "xieyi": "",
-//            "projectfrom": "自主品牌",
-//            "project_index": "17",
-//            "planshop": {
-//              "1": {
-//                "shop_area": "锦江区",
-//                "shop_jiedao": "成都市锦江区成都锦华万达广场店"
-//              },
-//              "2": {
-//                "shop_area": "青羊区",
-//                "shop_jiedao": "成都市青羊区成都青羊万达广场"
-//              },
-//              "3": {
-//                "shop_area": "金牛区",
-//                "shop_jiedao": "成都市金牛区成都金牛万达广场甲级写字楼-a座"
-//              },
-//              "4": {
-//                "shop_area": "武侯区",
-//                "shop_jiedao": "成都市武侯区武侯万达广场"
-//              }
-//            },
-//            "daoshi": {
-//              "1": {
-//                "daoshi_icon": "Public/uploadfile/2018/0413/b539c757dbf6761074d4a2dfa69e0d65.png",
-//                "daoshi_xingming": "顾问导师姓名一",
-//                "daoshi_zhiwei": "技术顾问",
-//                "daoshi_description": "顾问导师简介一"
-//              },
-//              "2": {
-//                "daoshi_icon": "Public/uploadfile/2018/0413/4c344c16f6e92db2998867581435f59e.png",
-//                "daoshi_xingming": "顾问导师姓名二",
-//                "daoshi_zhiwei": "技术顾问",
-//                "daoshi_description": "顾问导师简介二"
-//              }
-//            },
-//            "news": {
-//              "1": {
-//                "news_title": "新闻报道标题一",
-//                "news_href": "http://www.xinwenyi.com"
-//              },
-//              "2": {
-//                "news_title": "新闻报道标题二",
-//                "news_href": "http://www.xinwener.com"
-//              }
-//            },
-//            "projectpic": {
-//              "1": {
-//                "project_img": "Public/uploadfile/2018/0507/b2c2d9da85c65e546fe0ae4b6084ee36.png"
-//              },
-//              "2": {
-//                "project_img": "Public/uploadfile/2018/0507/b21ad62ea401cabc2b4aa7ae268ffeaa.png"
-//              }
-//            },
-//            "dsj": {
-//              "1": {
-//                "dsj_time": "2018年5月6日",
-//                "dsj_content": "2018年5月6日我公司发生了意见项目大事记，这是事件类容一"
-//              },
-//              "2": {
-//                "dsj_time": "2018年5月7日",
-//                "dsj_content": "2018年5月7日我公司发生了意见项目大事记，这是事件类容二"
-//              }
-//            },
-//            "shop": {
-//              "1": {
-//                "shop_name": "现有店铺名称",
-//                "shop_address": "现有店铺名称地址",
-//                "shop_zongtouru": "99999999999999999999",
-//                "shop_yunyingzhouqi": "360",
-//                "shop_fenhongshijian": "90",
-//                "shop_keliuliang": "500",
-//                "shop_renjunxiaofei": "50",
-//                "shop_shangnianshouru": "9000000",
-//                "shop_shangnianlirun": "6200000",
-//                "shop_shangjidushouru": "2250000",
-//                "shop_shangjidulirun": "900000"
-//              }
-//            },
-//            "luyan": {
-//              "luyan": "是",
-//              "jihuashu": "是",
-//              "chouhuazhouqi": "1个月",
-//              "luyanchangdi": "有",
-//              "shuomingren": "核心团队成员",
-//              "ishelp": "是"
-//            },
-//            "guquanshezhi": {
-//              "project_shoptype": "新店开设",
-//              "project_shopmianji": "360",
-//              "project_zongtouru": "5000000",
-//              "project_xiangmufang_chuzi": "3000000",
-//              "project_xiangmufang_gufen": "40",
-//              "project_hehuofang_chuzi": "2000000",
-//              "project_hehuofang_gufen": "60",
-//              "project_xiangmufang_shouyi": "40",
-//              "project_hehuofang_shouyi": "60",
-//              "project_xfhh_danbi": "300",
-//              "project_xfhh_gufen": "200",
-//              "project_xfhh_count": "500",
-//              "project_xfhh_tiyanmoney": "44",
-//              "project_gbhh_danbi": "220",
-//              "project_gbhh_gufen": "44",
-//              "project_gbhh_count": "44",
-//              "project_gbhh_tiyanmoney": "55",
-//              "project_lthh_danbi": "45",
-//              "project_lthh_gufen": "51",
-//              "project_lthh_count": "5",
-//              "project_lthh_tiyanmoney": "445",
-//              "project_other_shouyi": "路演股权设置",
-//              "guzhiyiju_img": ""
-//            },
-//            "zijinyongtu": {
-//              "zjyt_jiameng": "否",
-//              "zjyt_yufuzujin": "60000",
-//              "zjyt_lvyuebaozhengjin": "12000",
-//              "zjyt_peixunfei_money": "3000",
-//              "zjyt_peixunfei_mouth": "13",
-//              "zjyt_peixunfei_allmoney": "4444",
-//              "zjyt_gongzi_money": "4242",
-//              "zjyt_gongzi_mouth": "424",
-//              "zjyt_gongzi_allmoney": "424",
-//              "zjyt_zhuangxiu": "4242",
-//              "zjyt_yuanliao": "24525",
-//              "zjyt_chengligongsi": "2424",
-//              "zjyt_liudongzijin": "42474",
-//              "zjyt_chubeijin": "42474",
-//              "zjyt_guanggao": "354",
-//              "zjyt_caiwu": "4242",
-//              "zjyt_allmoney": "197603",
-//              "zjyt_remark": "路演资金用途"
-//            },
-//            "yunyingguankong": {
-//              "yygk_kaidianshijian": "23",
-//              "yygk_maolilv": "44",
-//              "yygk_fenhongshijian": "24",
-//              "yygk_gudongguanli": "路演运营管控，合伙人管理办法及要求",
-//              "yygk_zijinjianguan": "路演运营管控，资金监管",
-//              "yygk_agree": "同意"
-//            },
-//            "tuichu_image": {
-//              "1": {
-//                "xieyi_img": "Public/uploadfile/2018/0507/300436bf3ce98b6e26ba7dd901898ada.png"
-//              }
-//            },
-//            "luyan_jdt": 0,
-//            "guanzhu_count": "0",
-//            "order_count": "0",
-//            "isGuanZhu": "关注",
-//            "isLingTou": "项目领头",
-//            "isHeHuoYunYing": "合伙运营",
-//            "hehuo_tp": 0,
-//            "isLuYan": "报名路演",
-//            "xiangmu_hy_name": "餐饮美食"
-//          }
-//          this.hehuoLog = {
-//            "other_count": 4,
-//            "min_count": 1,
-//            "max_count": 3
-//          }
         })
       },
       toDecimal2(num) {
@@ -623,6 +822,10 @@
         }
         return `${num}%`;
       },
+      checkAddress(){
+
+      },
+
       /*
       * 关注
       * */
@@ -657,7 +860,9 @@
                 content: res.msg,
                 success: function(res) {
                   if (res.confirm) {
-
+                    wx.switchTab({
+                      url: '/pages/user/main'
+                    })
                   } else if (res.cancel) {
                     console.log('用户点击取消')
                   }
@@ -671,26 +876,86 @@
        * 报名路演
        */
       luyan(){
-
+        let params = {
+          id:this.id,
+          type:4,
+          token:this.token
+        };
+        if(this.detail.isLingTou  =='项目领头'){
+          objOpeByLt(params).then(this.requestCallback);
+        }else{
+          objOpeByOt(params).then(this.requestCallback);
+        }
       },
       /**
        *  运营
        */
       operate(){
-        let params = {
+        let self = this;
+        wx.showModal({
+          title: '提示',
+          content: "请选择参与合伙运营的方式",
+          cancelText:'消费合伙',
+          confirmText:'股本合伙',
+          cancelColor:'#3CC51F',
+          success: function(res) {
+            if (res.confirm) {
+              self.afterOperate(1)
+            } else if (res.cancel) {
+              self.afterOperate(2);
+            }
+          }
+        })
+      },
+
+      afterOperate(status){
+        let self = this;
+        if(status==1){
+          if(this.hehuos){
+            wx.showToast({
+              title: `您已参与股本合伙`,
+              icon: 'none',
+              duration: 2000
+            })
+          }else{
+            wx.showModal({
+              title:'提示',
+              content:'主要以货币形式参与合伙运营。获得更多利益分成、开拓眼界、更新思维、搭建新的资源圈、更多了解国家宏观经济形势，是否确定通过股本合伙参与该项目？',
+              success: function(res) {
+                if (res.confirm) {
+                  self.operateRequest(3)
+                }
+              }
+            })
+          }
+        }else{
+          if(this.hehuos){
+            wx.showToast({
+              title: `您已参与消费合伙`,
+              icon: 'none',
+              duration: 2000
+            })
+          }else{
+            wx.showModal({
+              title:'提示',
+              content:'以少量资金参与合伙、降低风险、注重合伙体验。更加适合入门级平台会员。是否确定通过消费合伙参与该项目？',
+              success: function(res) {
+                if (res.confirm) {
+                  self.operateRequest(2)
+                }
+              }
+            })
+          }
+        }
+      },
+
+      operateRequest(type){
+        let param  = {
           id:this.id,
-          type:1,
+          type,
           token:this.token
         };
-        if(this.detail.isHeHuoYunYing =='合伙运营'){
-          objOpeByLt(params).then(this.requestCallback);
-        }else if(this.detail.isHeHuoYunYing =='已消费合伙'){
-          params.type = 2;
-          objOpeByOt(params).then(this.requestCallback);
-        }else if(this.detail.isHeHuoYunYing =='已股本合伙'){
-          params.type = 3;
-          objOpeByOt(params).then(this.requestCallback);
-        }
+        this.hehuos? objOpeByOt(param).then(this.requestCallback):objOpeByLt(param).then(this.requestCallback);
       },
       /**
        * 领头
@@ -707,6 +972,7 @@
           objOpeByOt(params).then(this.requestCallback);
         }
       },
+
       requestCallback(res){
         if (res.status == 1) {
           wx.showToast({
@@ -729,7 +995,9 @@
               content: res.msg,
               success: function(res) {
                 if (res.confirm) {
-
+                  wx.switchTab({
+                    url: '/pages/user/main'
+                  })
                 } else if (res.cancel) {
                   console.log('用户点击取消')
                 }
@@ -741,6 +1009,11 @@
     },
     mounted(){
       this.collected =!!(this.detail&&this.detail.guanzhu_css_class == 'yes_guanzhu');
+      if(this.detail&&this.detail.isHeHuoYunYing == '合伙运营'){
+        this.hehuos = false
+      }else{
+        this.hehuos = true
+      }
     },
     onLoad: function(option){
       this.id = option.id;
@@ -764,228 +1037,6 @@
   };
 </script>
 
-<style scoped  lang='less'>
-.inner {
-  background-color: #f6f6f6;
-}
-.describe {
-  width: 100%;
-  margin-top: 43rpx;
-  padding: 24px 30px 0;
-  box-sizing: border-box;
-  background-color: #fff;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-.describe p:nth-child(1) {
-  color: #ff7803;
-  font-size: 34rpx;
-  text-align: center;
-}
-.describe p:nth-child(2) {
-  font-size: 28rpx;
-  padding-bottom: 44rpx;
-}
-.address {
-  padding: 10rpx 0;
-  font-size: 24rpx;
-  background-color: #fff;
-  border-bottom: 1px solid #f5f5f5;
-}
-.address li {
-  width: 50%;
-  text-align: center;
-}
-.address li:nth-child(1) {
-  border-right: 1rpx solid #f5f5f5;
-  box-sizing: border-box;
-}
-.address li img {
-  width: 22rpx;
-  height: 29rpx;
-  vertical-align: middle;
-  position: relative;
-  top: -2rpx;
-}
-.team {
-  margin-top: 20rpx;
-  background-color: #fff;
-  padding: 28rpx 0 0;
-  p:nth-child(1) {
-    text-align: center;
-    color: rgba(255, 120, 3, 1);
-    font-size: 34rpx;
-    margin-bottom: 28rpx;
-  }
-  p:nth-child(2) {
-    font-size: 28rpx;
-    padding-bottom: 22rpx;
-    padding-left: 32rpx;
-    border-bottom: 1px solid #f5f5f5;
-  }
-  ul {
-    li {
-      height: 140rpx;
-      line-height: 140rpx;
-      border-bottom: 1rpx solid #f5f5f5;
-      padding: 0px 30rpx;
-      div:nth-child(1) {
-        width: 90rpx;
-        height: 90rpx;
-        border-radius: 45rpx;
-        background-color: #000;
-        overflow: hidden;
-        margin-top: 30rpx;
-        margin-left: 20rpx;
-      }
-      div:nth-child(2) {
-        line-height: 24rpx;
-        margin-top: 40rpx;
-        p:nth-child(1) {
-          text-align: right;
-          font-size: 28rpx;
-          color: #000;
-        }
-        p:nth-child(2) {
-          border: 0px;
-          font-size: 26rpx;
-          text-align: right;
-          color: #666666;
-        }
-      }
-    }
-  }
-}
-.details {
-  margin-top: 20rpx;
-  background-color: #fff;
-  > p {
-    font-size: 34rpx;
-    color: rgba(255, 120, 3, 1);
-    padding: 52rpx 0;
-    border-bottom: 1rpx solid #f5f5f5;
-    text-align: center;
-  }
-}
-.details-text {
-  padding: 38rpx 30rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-  p {
-    font-size: 26rpx;
-    span {
-      display: inline-block;
-      width: 50%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-  .show-text {
-    color: #154ff5;
-    margin-top: 32rpx;
-  }
-  .details-img {
-    width: 100%;
-  }
-}
-.details-text p:nth-child(1) {
-  font-size: 30rpx;
-  position: relative;
-  margin-bottom: 18rpx;
-  span {
-    position: absolute;
-    width: 60rpx;
-    border-radius: 3rpx;
-    height: 6rpx;
-    background: rgba(255, 120, 3, 1);
-    left: 0rpx;
-    bottom: -5rpx;
-  }
-}
-.scroll-bar {
-  padding: 36rpx 30rpx;
-  p {
-    font-size: 26rpx;
-    color: rgba(51, 51, 51, 1);
-    line-height: 36rpx;
-  }
-  ul {
-    li {
-      font-size: 26rpx;
-    }
-    li:nth-child(1),
-    li:nth-child(3) {
-      width: 15%;
-    }
-    li:nth-child(3) {
-      text-align: right;
-    }
-    li:nth-child(2) {
-      width: 70%;
-      .scroll-box {
-        width: 100%;
-        height: 26rpx;
-        border-radius: 10px;
-        box-shadow: -5rpx -5rpx 10rpx #e8e8e8 inset; /* For Latest Opera */
-        overflow: hidden;
-        position: relative;
-        top: 8rpx;
-        span {
-          color: transparent;
-          width: 78%;
-          height: 26rpx;
-          background-color: rgba(255, 120, 3, 1);
-          display: block;
-          border-radius: 10px;
-        }
-      }
-    }
-  }
-  .woxiang {
-    color: #cbcbcb;
-    font-size: 26rpx;
-    border-bottom: 1rpx solid rgba(245, 245, 245, 1);
-    margin-top: 50rpx;
-  }
-  .bottom-list {
-    padding: 26rpx 0rpx 0rpx 0rpx;
-    li {
-      width: 25% !important;
-      text-align: center;
-      line-height: 24rpx;
-      border-right: 1px solid #f5f5f5;
-      box-sizing: border-box;
-      span {
-        display: block;
-        text-align: center;
-      }
-      img {
-        width: 30rpx;
-        height: 30rpx;
-        position: relative;
-        top: 5rpx;
-      }
-    }
-    li:nth-child(4) {
-      border: 0;
-    }
-  }
-}
-.class-info{
-  width: 90%;
-}
-._swiper{
-  margin-top: 20rpx;
-}
-._swiper .class-info ._image {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 90%;
-  height: 70%;
-  z-index: -1;
-}
-</style>
+
 
 
