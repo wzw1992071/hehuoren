@@ -85,6 +85,17 @@ export function objOpeByOt(data){
   });
 }
 
+/**
+ * send_project_sms asag
+ * @param data
+ */
+export function sendProjectSms(data){
+  return service({
+    url:`/xiangmu/send_sitesms_xiangmu`,
+    data,
+    method:'POST'
+  });
+}
 
 
 
