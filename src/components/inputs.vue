@@ -9,18 +9,22 @@
             <input type="text" class="text" :placeholder="text" v-model="val" @change="change">
             <span class="measurement">{{ measurement }}</span>
         </div>
+      
         <div v-if="type == 3" class="type-three type" @click="toggleShow">
             <div class="title">{{title}}</div>
-            <div class="text">{{text}}</div>
+            <picker class="text" v-if="type == 3" mode='selector' @change="getVal($event)" range-key="name" :value="0" :range="options">
+               {{text}}
+            </picker>
+            <!-- <div ></div> -->
             <div class="arrow"><img src="/static/images/arrowDownFine.png"></div>
         </div>
-        <option-card
+        <!-- <option-card
             v-if="type == 3 && show "
             :lists="options"
             :title="optionsTitle"
             @close="close"
             @selected="getVal"
-        ></option-card>
+        ></option-card>  -->
         <div class="tip" v-if="tip">{{tip}}</div>
     </div>
 </template>
@@ -43,7 +47,7 @@ export default {
             measurement: '',
             // type 3
             optionsTitle: '',
-            options: ['', '', ''],
+            options: [],
             // 值
             val: '',
             // 值的接收者
@@ -67,13 +71,26 @@ export default {
         close: function () {
             this.show = false
         },
-        getVal: function (val) {
-            this.text = val
-            this.$emit('change', {
-                val: this.text,
-                handler: this.handler
-            }) 
-            this.close()
+        getVal: function (event) {
+            let target
+            if(event){
+                let index = event.mp.detail.value;
+                target = this.options[index];
+            }
+            if(this.type==3){
+                this.text=target.name
+                this.$emit('change', {
+                    text: target.name,
+                    handler: this.handler,
+                    val:target.value
+                }) 
+            }else{
+                this.$emit('change', {
+                    text: this.text,
+                    handler: this.handler,
+                }) 
+            }
+            
         }
     },
     created () {
@@ -83,8 +100,8 @@ export default {
             this.handler = _info.handler ? _info.handler : this.handler
             this.measurement = _info.measurement ? _info.measurement : this.measurement
             this.options = _info.options ? _info.options : this.options
+            this.text = _info.options ? _info.options[0].text : this.text
             this.text = _info.text ? _info.text : this.text
-            this.text = _info.options ? _info.options[0] : this.text
             this.title = _info.title ? _info.title : this.title
             this.optionsTitle = _info.optionsTitle ? _info.optionsTitle : this.optionsTitle
             this.tip = _info.tip ? _info.tip : this.tip

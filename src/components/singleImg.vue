@@ -57,7 +57,7 @@ export default {
           ? this.baseUrl+_info.imgSrc
           : this.img
       }
-      console.log(this.img)
+      // console.log(this.img)
   }
 };
 </script>

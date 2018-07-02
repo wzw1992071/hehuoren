@@ -53,37 +53,40 @@ export default {
       inputsOne: {
           type: 3,
           title: '*生活圈',
-          text: 'Arthur',
+          text: '请选择工作圈',
           optionsTitle: '*生活圈',
-          options: ['武侯区', '金牛区', '什么区'],
+          options: [
+          ],
           // 存储input值的key,可以不在这组数据里
-          handler: 'inputsOne.val',
+          handler: 'inputsOne',
           val: ''
       },
       inputstwo:{
         type: 3,
         title: '*工作圈',
-        text: 'Arthur',
+        text: '请选择工作圈',
         optionsTitle: '*工作圈',
-        options: ['武侯区', '金牛区', '什么区'],
+        options: [],
         // 存储input值的key,可以不在这组数据里
-        handler: 'inputsOne.val',
+        handler: 'inputstwo',
         val: ''
       },
       inputsthree:{
         type: 3,
         title: '*学历',
-        text: 'Arthur',
+        text: '请选择学历',
         optionsTitle: '*学历',
-        options: ['高中', '大专', '本科','硕士','博士'],
+        options: [],
         // 存储input值的key,可以不在这组数据里
-        handler: 'inputsOne.val',
+        handler: 'inputsthree',
         val: ''
       },
       username:{
        title: '*昵称',
        text: '请输入昵称',
-       type:1
+       type:1,
+       text: "",
+        handler: 'username',
       },
       btnData:{
         type:'blue-line',
@@ -101,15 +104,15 @@ export default {
       proDetail1: {
           type: 1,
           title: '请输入街道',
-          text: 'XX市XX区XX号',
-          handler: '请输入街道',
+          text: '',
+          handler: 'proDetail1',
           tip: `(准确输入地址可使身边更多优秀项目关注到您)`
       },
       proDetail2: {
           type: 1,
           title: '请输入街道',
-          text: 'XX市XX区XX号',
-          handler: '请输入街道',
+          text: '',
+          handler: 'proDetail2',
           tip: `(准确输入地址可使身边更多优秀项目关注到您)`
       },
     };
@@ -127,35 +130,82 @@ export default {
           tip: '将出现在个人中心及一些其他列表中.清晰的头像能提高您的诚信度.支持JPG,PNG格式,不大于5MB',
           imgSrc:''
       }
-      // wx.getStorageSync({
-      //   key: 'hehuoren_form_1',
-      //   success: function(res) {
-      //     console.log(res.data)
-          // a.imgSrc = JSON.parse(res.data).info.icon
-      //   } 
-      // })
       a.imgSrc = JSON.parse(wx.getStorageSync('hehuoren_form_1')).info.icon
-      // console.log(JSON.parse(wx.getStorageSync('hehuoren_form_1')))
       return a ;
     },
     formData(){
       wx.getStorage({
         key: 'hehuoren_form_1',
         success: function(res) {
-          // console.log(JSON.parse(res.data))
           return JSON.parse(res.data)
         } 
       })
     }
   },
   methods: {
+    getVal(value){
+      if(value){
+        // 判断是否为下拉框
+        if(value.val){
+          this[value.handler].val=value.val
+          this[value.handler].text=value.text
+        }else{
+          this[value.handler].text=value.text
+        }
+      }
+      console.log(this[value.handler])
+    }
   },
-  mounted() {
+  created() {
     let that =this
+    // var value = wx.getStorageSync('key')
+    // that.avatar.imgSrc = JSON.parse(value).info.icon
     wx.getStorage({
       key: 'hehuoren_form_1',
       success: function(res) {
-        that.avatar.imgSrc = JSON.parse(res.data).info.icon
+        let a = JSON.parse(res.data)
+        that.avatar.imgSrc = a.info.icon //初始化头像
+        that.username.text =a.info.truename //初始化真实姓名
+        that.proDetail1.text = a.info.liveplace  //初始化生活圈
+        that.proDetail2.text = a.info.workplace  //初始化工作圈
+        console.log(a)
+        a.livequan.forEach(function(item,index){
+          that.inputsOne.options.push({
+            name:item.typename,
+            value:item.id
+          })
+        })
+        a.workquan.forEach(function(item,index){
+          that.inputstwo.options.push({
+            name:item.typename,
+            value:item.id
+          })
+        })
+        a.xueli.forEach(function(item,index){
+          that.inputsthree.options.push({
+            name:item.typename,
+            value:item.id
+          })
+        })
+        //初始化学历
+        if(a.info.culture!="undefined"){
+          let _xueli =that.inputsthree.options.find(item => item.id == a.info.culture)
+          this.inputsthree.text = _xueli.typename
+          this.inputsthree.val = _xueli.id
+        }
+        // 初始化生活圈
+        if(a.info.liveing!="undefined"){
+          let _liveing =that.inputsOne.options.find(item => item.id == a.info.liveing)
+          this.inputsOne.text = _liveing.typename
+          this.inputsOne.val = _liveing.id
+        }
+        // 初始化工作圈
+        if(a.info.worklive!="undefined"){
+          let _worklive =that.inputsTwo.options.find(item => item.id == a.info.worklive)
+          this.inputsTwo.text = _worklive.typename
+          this.inputsTwo.val = _worklive.id
+        }
+        
       } 
     })
   },
