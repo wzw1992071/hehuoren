@@ -97,7 +97,21 @@ export function sendProjectSms(data){
   });
 }
 
+export function loadMapHhr(data){
+  return service({
+    url: '/index/hhr_map',
+    data,
+    method: "GET"
+  })
+}
 
+export function loadMapXm(data){
+  return service({
+    url: '/index/xiangmu_map',
+    data,
+    method: "GET"
+  })
+}
 
 
 

@@ -43,19 +43,19 @@
       <div class="describe-content" v-show="showList[0]">
         <p v-if="detail" class="p"> {{detail.description}} </p>
         <ul class="address clear_left_float">
-          <li>
+          <li @click="checkAddress(1)">
             <img src="/static/images/gps.jpg">
             <span>项目预期地址</span>
           </li>
-          <li>
+          <li @click="showAddress">
             <img src="/static/images/liebiao.png">
             <span>项目分布列表</span>
           </li>
-          <li>
+          <li @click="checkAddress(2)">
             <img src="/static/images/gps.jpg">
             <span>合伙人预期地址</span>
           </li>
-          <li>
+          <li  @click="usershow">
             <img src="/static/images/liebiao.png">
             <span>合伙人分布列表</span>
           </li>
@@ -441,6 +441,29 @@
         </ul>
       </div>
     </div>
+
+    <div class="mock" v-if="address.length && address_show" @click="addresshidden">
+      <ul>
+        <li class="header">
+          <span>区域</span>
+          <span>街道</span>
+        </li>
+        <li v-for="(item, index) in address" :key="index">
+          <span class="area">{{item.shop_area}}</span>
+          <span class="jiedao">{{item.shop_jiedao}}</span>
+        </li>
+      </ul>
+    </div>
+    <div class="mock" v-if="showuserList.length&&user_show"   @click="usershidden">
+      <ul>
+        <li class="header">
+          <span>地址</span>
+        </li>
+        <li v-for="(item,index) in showuserList" :key="index">
+          {{item.liveplace}}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -464,6 +487,10 @@
         collected:false,
         hehuos:false,
         jieduan: 0,
+        address: [],
+        address_show: false,
+        user_show: false,
+        showuserList:[]
       };
     },
     components: {},
@@ -474,8 +501,12 @@
           id:this.id
         },this.token).then(res=>{
           this.detail = res.data.info;
-          if (detail) this.jieduan = detail.jieduan ? detail.jieduan : 0;
+          if (this.detail ){
+            this.jieduan = this.detail.jieduan ? this.detail.jieduan : 0;
+          }
           this.hehuoLog = res.data.hehuoLog;
+          this.address = this.detail.planshopAddress||[];
+          this.showuserList = this.detail.resList||[]
         })
       },
       toDecimal2(num) {
@@ -486,9 +517,23 @@
         }
         return `${num}%`;
       },
+      usershow(){
+        this.user_show = true;
+      },
+      showAddress() {
+        this.address_show = true;
+      },
+      addresshidden() {
+        this.address_show = false;
+      },
+      usershidden() {
+        this.user_show = false;
+      },
 //      查看地址
-      checkAddress(){
-
+      checkAddress(type){
+        wx.navigateTo({
+          url: `/pages/map/main?id=${this.detail.id}&type=${type}`
+        })
       },
       showIt3(i){
         if(i == 0 && !this.detail.shop.length) {

@@ -28,13 +28,13 @@ export default {
       'pages/project/main', // 我的项目
       'pages/projectData/main', // 创建项目
       'pages/manual/main', // 手册
-      '^pages/projectdetails/main', // 项目详情
+      'pages/projectdetails/main', // 项目详情
       'pages/projectModification/main',
       'pages/generalPartner/main', //一般合伙人
       'pages/certifiedPartner/main', //认证合伙人
       'pages/experiencePartner/main', //经验合伙人
       'pages/institutionalPartners/main', //机构合伙人
-      'pages/projectShow/main', // 项目列表(优质项目)
+      '^pages/projectShow/main', // 项目列表(优质项目)
       'pages/over/main', // 项目完成
       'pages/projectModifyMain/main', // 我的项目修改主页
       'pages/projectModifyShow/main', // 修改展示类
@@ -42,6 +42,7 @@ export default {
       'pages/projectUpdateHot/main', // 完善热门类
       'pages/projectUpdateRoadshow/main', // 完善路演类
       'pages/logs/main', // 日志
+      'pages/map/main', // 地图
     ],
     window: {
       backgroundTextStyle: 'light',
