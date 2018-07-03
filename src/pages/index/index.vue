@@ -84,8 +84,8 @@
         :circular=1
         class="swiper-box"
         >
-        <block :wx:for="res" :wx:key="index">
-          <swiper-item>
+        <block v-for="(item,index) in res" :key="index">
+          <swiper-item @click="loadDetail(item)">
             <div class="image">
               <image v-bind:src="item?baseUrl+item.logo:''" class="slide-image" width=100 />
             </div>
@@ -167,7 +167,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['isLogin','baseUrl']),
+    ...mapGetters(['isLogin','baseUrl','token']),
   },
 
   watch:{
@@ -211,6 +211,17 @@ export default {
     },
     goTop(){
       this.scrollY = 1;
+    },
+    loadDetail(item){
+      if(!this.token){
+        wx.navigateTo({
+          url: '/pages/login/main'
+        })
+      }else{
+        wx.navigateTo({
+          url: '/pages/projectdetails/main?id='+item.id
+        })
+      }
     }
   },
 
