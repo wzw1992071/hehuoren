@@ -23,23 +23,46 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters(['baseUrl']),
+    ...mapGetters(['baseUrl','token']),
   },
   methods: {
+   
     getImg() {
+      let that = this
+
       wx.chooseImage({
         success: function(res) {
-          this.img = res.tempFilePaths[0];
-          console.log(this.img)
-          wx.getImageInfo({
-            src: res.tempFilePaths[0],
-            success: function(res) {
-              //   console.log(res);
-              //   console.log(res);
+          that.img = res.tempFilePaths[0];
+          console.log(res.tempFiles)
+          var tempFilePaths = res.tempFilePaths
+          wx.uploadFile({
+            url: `${that.baseUrl}Index/file`, 
+            filePath: tempFilePaths[0],
+            name: 'file',
+            formData:{
+              'token': that.token
+            },
+            success: function(res){
+              that.$emit("geturl", res);
+              //do something
             }
-          });
+          })
         }
-      });
+      })
+
+      // wx.chooseImage({
+      //   success: function(res) {
+      //     that.img = res.tempFilePaths[0];
+      //     // console.log(res)
+      //     wx.getImageInfo({
+      //       src: res.tempFilePaths[0],
+      //       success: function(res) {
+      //         that.$emit("geturl", res.path);
+      //         //   console.log(res);
+      //       }
+      //     });
+      //   }
+      // });
     }
   },
   created() {

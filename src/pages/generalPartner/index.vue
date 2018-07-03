@@ -12,7 +12,7 @@
     <div class="show-data-avatar">
       <ul>
         <li>
-          <single-img :info="avatar"></single-img>
+          <single-img :info="avatar" @geturl="geturl"></single-img>
         </li>
         <li>
           <inputs @change="getVal" :info="username"></inputs>
@@ -30,9 +30,9 @@
         </li>
       </ul>
       <div class="show-btn">
-        <modify-input :info="btnData"></modify-input>
-        <modify-input :info="btnDatatwo"></modify-input>
-        <modify-input :info="btnDataThree"></modify-input>
+        <modify-input :info="btnData" @handleEvent="Cancel()"></modify-input>
+        <modify-input :info="btnDatatwo" @handleEvent="Save(1)"></modify-input>
+        <modify-input :info="btnDataThree" @handleEvent="Save(2)"></modify-input>
       </div>
       
     </div>
@@ -46,6 +46,8 @@ import singleImg from '@/components/singleImg';
 import inputs from '@/components/inputs'
 // 按钮
 import modifyInput from '@/components/modifyInput'
+import {mapGetters} from "vuex";
+import request from '@/utils/request';
 export default {
   data: function() {
     return {
@@ -85,7 +87,7 @@ export default {
        title: '*昵称',
        text: '请输入昵称',
        type:1,
-       text: "",
+      //  text: "",
         handler: 'username',
       },
       btnData:{
@@ -115,6 +117,7 @@ export default {
           handler: 'proDetail2',
           tip: `(准确输入地址可使身边更多优秀项目关注到您)`
       },
+      newIcon:""
     };
   },
   components: {
@@ -124,6 +127,7 @@ export default {
     modifyInput
   },
   computed:{
+    ...mapGetters([ 'token']),
     avatar(){
       let a ={
           title: '*本人头像',
@@ -146,14 +150,87 @@ export default {
     getVal(value){
       if(value){
         // 判断是否为下拉框
-        if(value.val){
+        if(value.text){
           this[value.handler].val=value.val
           this[value.handler].text=value.text
         }else{
-          this[value.handler].text=value.text
+          this[value.handler].text=value.val
         }
       }
-      console.log(this[value.handler])
+    },
+    geturl(val){
+      let a  = JSON.parse(val.data)
+      console.log(a)
+      if(a.msg=="上传成功"){
+        this.newIcon = a.new_url
+      }else{
+        wx.showToast({
+          title: '图片上传失败',
+          icon: 'none',
+          duration: 1000
+        })
+      }
+    },
+    Cancel(){
+      wx.navigateBack({
+        delta: 1
+      })
+    },
+    Save(type){
+      let that= this
+      let params = {}
+      params.token = that.token;
+      params.separate = 1;
+      params.truename = that.username.text;
+      params.live = that.inputsOne.val;
+      params.liveplace = that.proDetail1.text;
+      params.worklive = that.inputstwo.val;
+      params.workplace = that.proDetail2.text
+      params.xueli = that.inputsthree.val;
+      params.icon = that.newIcon?that.newIcon:that.avatar.imgSrc;
+      // console.log(params)
+      // return false
+      request({
+        url: `/member/member_conf?type=1&token=${that.token}`,
+        data: params,
+        method: "post"
+      }).then(res => {
+         if (res.status == 1) {
+            if (type == 2) {
+              let newParam = {}
+              newParam.token=that.token
+              newParam.separate=1
+              newParam.gopage=2
+              request({
+                url: `/member/member_conf?separate=1&gopage=2&token=${that.token}`,
+                method: "get"
+              }).then(res => {
+                if (res.data) {
+                  wx.setStorage({
+                    key:"hehuoren_form_2",
+                    data:JSON.stringify(res.data)
+                  })
+                  wx.redirectTo({
+                    url: '/pages/certifiedPartner/main'
+                  })
+                } else {
+                }
+              });
+            }else{
+              wx.reLaunch({
+                url:'/pages/over/main'
+              })
+           }
+
+
+         }else{
+           wx.showToast({
+            title: res.msg?res.msg:res.data,
+            icon: 'none',
+            duration: 2000
+          })
+         }
+      })
     }
   },
   created() {
@@ -169,18 +246,26 @@ export default {
         that.proDetail1.text = a.info.liveplace  //初始化生活圈
         that.proDetail2.text = a.info.workplace  //初始化工作圈
         console.log(a)
-        a.livequan.forEach(function(item,index){
+        // a.citylist.forEach(function(item,index){
+        //   that.inputsOne.options.push({
+        //     name:item.name,
+        //     value:item.area
+        //   })
+        //   that.inputstwo.options.push({
+        //     name:item.name,
+        //     value:item.area
+        //   })
+        // })
+        for(var i in a.citylist){
           that.inputsOne.options.push({
-            name:item.typename,
-            value:item.id
+            name: a.citylist[i].name,
+            value: a.citylist[i].area
           })
-        })
-        a.workquan.forEach(function(item,index){
           that.inputstwo.options.push({
-            name:item.typename,
-            value:item.id
+            name: a.citylist[i].name,
+            value: a.citylist[i].area
           })
-        })
+        }
         a.xueli.forEach(function(item,index){
           that.inputsthree.options.push({
             name:item.typename,
@@ -189,21 +274,21 @@ export default {
         })
         //初始化学历
         if(a.info.culture!="undefined"){
-          let _xueli =that.inputsthree.options.find(item => item.id == a.info.culture)
-          this.inputsthree.text = _xueli.typename
-          this.inputsthree.val = _xueli.id
+          let _xueli =that.inputsthree.options.find(item => item.value == a.info.culture)
+            that.inputsthree.text = _xueli.name
+            that.inputsthree.val = _xueli.value
         }
         // 初始化生活圈
         if(a.info.liveing!="undefined"){
-          let _liveing =that.inputsOne.options.find(item => item.id == a.info.liveing)
-          this.inputsOne.text = _liveing.typename
-          this.inputsOne.val = _liveing.id
+          let _liveing =that.inputsOne.options.find(item => item.value == a.info.liveing)
+          that.inputsOne.text = _liveing.name
+          that.inputsOne.val = _liveing.value
         }
         // 初始化工作圈
         if(a.info.worklive!="undefined"){
-          let _worklive =that.inputsTwo.options.find(item => item.id == a.info.worklive)
-          this.inputsTwo.text = _worklive.typename
-          this.inputsTwo.val = _worklive.id
+          let _worklive =that.inputstwo.options.find(item => item.value == a.info.worklive)
+          that.inputstwo.text = _worklive.name
+          that.inputstwo.val = _worklive.value
         }
         
       } 

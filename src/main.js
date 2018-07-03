@@ -19,7 +19,7 @@ export default {
       'pages/index/main', // 首页
       'pages/logs/main', // 日志
       'pages/partner/main', // 合伙人
-      'pages/login/main', // 登陆
+      '^pages/login/main', // 登陆
       'pages/sign/main', // 注册
       'pages/user/main', // 个人中心
       'pages/advise/main', // 我要吐槽
@@ -34,7 +34,7 @@ export default {
       'pages/certifiedPartner/main', //认证合伙人
       'pages/experiencePartner/main', //经验合伙人
       'pages/institutionalPartners/main', //机构合伙人
-      '^pages/projectShow/main', // 项目列表(优质项目)
+      'pages/projectShow/main', // 项目列表(优质项目)
       'pages/over/main', // 项目完成
       'pages/projectModifyMain/main', // 我的项目修改主页
       'pages/projectModifyShow/main', // 修改展示类
