@@ -113,6 +113,14 @@ export function loadMapXm(data){
   })
 }
 
+/*我的项目*/
+export function queryMyObj(data){
+  return service({
+    url: '/Member/member_my_project',
+    data,
+    method: "POST"
+  })
+}
 
 
 

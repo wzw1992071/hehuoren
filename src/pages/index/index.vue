@@ -5,7 +5,7 @@
     </div>
     <scroll-view v-bind:scrol-y="scrollY" v-bind:bindscroll="scrollTop" height="500px" >
     <div class="header">
-      <NNav @toggle="toggle" :tipsNumber="tipsNumber" />
+      <NNav @toggle="toggle" :tipsNumber="msgNumber" />
       <div class="counter">
         <div class="number-scroll">
           <div class="title">合伙人</div>
@@ -130,7 +130,6 @@ import { homeLoad, myMassage} from '@/apis/index'
 export default {
   data: function() {
     return {
-      tipsNumber: 0,
       partnerTotal: 0,
       projectTotal: 0,
       promptDate: "2018年05月01日",
@@ -167,7 +166,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['isLogin','baseUrl','token']),
+    ...mapGetters(['isLogin','baseUrl','token','msgNumber']),
   },
 
   watch:{
@@ -199,7 +198,6 @@ export default {
         let data = res.data;
         this.partnerTotal = data.tzrcountnum || 0;
         this.projectTotal = data.xmcountnum || 0;
-        this.tipsNumber = data.no_read || 0;
         this.grade = data.grade || [];
         this.banner = data.banner;
         this.datajson = data.datajson || 0;

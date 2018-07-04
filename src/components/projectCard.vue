@@ -15,10 +15,16 @@
             <div class="info">
                 <div class="name">
                     <span>{{detail.title}}</span>
-                    <span>{{detail.grade_name}}</span>
+                    <span class="zhanshilei" v-if="detail.grade==1">展示类</span>
+                    <span class="yurelei" v-if="detail.grade==2">预热类</span>
+                    <span class="remenlei" v-if="detail.grade==3">热门类</span>
+                    <span class="luyanlei" v-if="detail.grade==4">准路演类</span>
+                    <span class="red" v-if="detail.jieduan==1">首次开店</span>
+                    <span class="red" v-if="detail.jieduan==2">开设分店</span>
+                    <span class="red" v-if="detail.jieduan==3">老店重组</span>
                 </div>
-                <p class="slogan">{{detail.yijuhua}}</p>
-                <p class="type">{{detail.typename+'|'+detail.typenamedetail}}</p>
+                <p class="slogan oneover">{{detail.yijuhua}}</p>
+                <p class="type onetwo">{{detail.xiangmu_hy_name}}</p>
             </div>
             <div class="mark">
                 <div class="heat"><span>热度：</span><span :class="{hot: detail.jdb > 50}">{{detail.jdb}}%</span></div>
@@ -169,32 +175,61 @@
     justify-content: space-between;
     align-items: flex-end;
 }
-
 .name {
-    display: flex;
-    align-items: center;
-    margin:20rpx 0 16rpx;
+  display: flex;
+  max-width: 4.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0.2rem 0 0.16rem;
 }
 
 .name span {
-    display: inline-block;
+  display: inline-block;
 }
 
-.name span:first-child{
-    font-size: 32rpx;
-    color: #333;
-    font-weight: 600;
-    margin-right: 20rpx;
+.name span:first-child {
+  font-size: 0.32rem;
+  color: #333;
+  font-weight: 600;
+  display: inline-block;
+  width: 4.5rem;
 }
 
-.name span:last-child {
-    font-size: 22rpx;
-    color: #f4d60f;
-    border: solid 2rpx #f4d60f;
-    line-height: 1;
-    padding: 5rpx 22rpx;
+.name span:nth-child(3),
+.name span:nth-child(2) {
+  font-size: 0.22rem;
+  border: solid 0.02rem;
+  line-height: 1;
+  padding: 0.05rem 0.22rem;
+  border-radius: 0.08rem;
+  margin: .1rem 0;
 }
 
+.name span:nth-child(2) {
+  margin-right: 0.2rem;
+}
+.name .remenlei {
+  border-color: #f5db47;
+  color: #f5db47;
+}
+.name .yurelei {
+  border-color: #3adb99;
+  color: #3adb99;
+}
+.name .luyanlei {
+  border-color: #ff7803;
+  color: #ff7803;
+}
+
+.name .red {
+
+  border-color: #f00;
+  color: #f00;
+}
+.name .zhanshilei {
+  border-color: #3a6edb;
+  color: #3a6edb;
+}
 .slogan,
 .type {
     font-size: 28rpx;

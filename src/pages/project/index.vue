@@ -3,33 +3,37 @@
         <user-header></user-header>
         <div class="tab">
             <div>
-                <div
-                    v-for="(item, index) in tabs"
-                    :key="index"
-                    :class="{active:active[index]}"
-                    @click="getActive(index)"
-                >
-                    {{ item }}
-                </div>
+                <div v-for="(item,index) in tabs" @click="queryObj(index+1)" :key="index" :class="{active:item.active}" >{{item.title}}</div>
             </div>
         </div>
-
-        <!-- should v-for -->
-        <project-card :gray="1" @event="navigation"></project-card>
-        <project-card :gray="1"></project-card>
-        <project-card :gray="1"></project-card>
+      <div class="item-content">
+        <scroll-view scroll-y style="height: 100%" @scrolltolower="loadMore">
+          <div v-for="(item,key,index) in list" :key="key">
+            <project-card :gray="1" @handlerClick="loadDetail" :detail="item" ></project-card>
+          </div>
+        </scroll-view>
+      </div>
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 import userHeader from "@/components/userHeader";
 import projectCard from "@/components/projectCard";
-
+import{queryMyObj} from '@/apis/index'
+import{mapGetters} from 'vuex'
 export default {
     data: function () {
         return {
-            tabs: ['发布的', '关注的', '洽谈的', '合伙中'],
-            active: [true, false, false, false]
+            tabs:[
+              {title:'发布的',active:true},
+              {title:'关注的',active:false},
+              {title:'洽谈的',active:false},
+              {title:'合伙中',active:false}
+            ],
+            type:1,
+            page:1,
+            couldLoadMore:true,
+            list:[]
         }
     },
     components: {
@@ -37,20 +41,60 @@ export default {
         projectCard
     },
     methods: {
-        getActive: function (i) {
-            let arr = [false, false, false, false]
-            arr[i] = true
-            this.active = arr;
+        loadDetail(item){
+          if(!this.token){
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
+          }else{
+            wx.navigateTo({
+              url: '/pages/projectdetails/main?id='+item.id
+            })
+          }
         },
-        navigation: function () {
-            try {
-                wx.navigateTo({
-                    url: '/pages/projectdetails/main'
-                })
-            } catch (e) {
-
+        loadMore(){
+            console.log('more')
+            if(this.couldLoadMore){
+              this.page++;
+              this.queryMyObjInfo();
             }
+        },
+        queryObj(index){
+          this.type = index;
+          for (let i = 0; i < this.tabs.length; i++) {
+            if (index - 1 == i) {
+              this.tabs[i].active = true
+            } else {
+              this.tabs[i].active = false
+            }
+          };
+          this.list = [];
+          this.page = 1;
+          this.queryMyObjInfo();
+        },
+        queryMyObjInfo(){
+          queryMyObj({
+            token:this.token,
+            separate:1,
+            type:this.type,
+            page:this.page
+          }).then(res=>{
+            let data = res.data;
+            if(data.res){
+              this.couldLoadMore = true;
+              let tempList  = this.list;
+              this.list = tempList.concat(data.res);
+            }else{
+              this.couldLoadMore = false;
+            }
+          })
         }
+    },
+    mounted(){
+      this.queryMyObjInfo();
+    },
+    computed:{
+      ...mapGetters(['token'])
     }
 }
 </script>
@@ -59,7 +103,13 @@ export default {
 page {
     background: #f6f6f6;
 }
-
+.item-content{
+  position: absolute;
+  top:500rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 .tab {
     display: flex;
     padding: 40rpx 40rpx 0;

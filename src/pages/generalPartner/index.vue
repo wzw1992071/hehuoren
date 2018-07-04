@@ -34,7 +34,7 @@
         <modify-input :info="btnDatatwo" @handleEvent="Save(1)"></modify-input>
         <modify-input :info="btnDataThree" @handleEvent="Save(2)"></modify-input>
       </div>
-      
+
     </div>
   </div>
 </template>
@@ -51,7 +51,7 @@ import request from '@/utils/request';
 export default {
   data: function() {
     return {
-      
+
       inputsOne: {
           type: 3,
           title: '*生活圈',
@@ -142,7 +142,7 @@ export default {
         key: 'hehuoren_form_1',
         success: function(res) {
           return JSON.parse(res.data)
-        } 
+        }
       })
     }
   },
@@ -159,10 +159,9 @@ export default {
       }
     },
     geturl(val){
-      let a  = JSON.parse(val.data)
-      console.log(a)
-      if(a.msg=="上传成功"){
-        this.newIcon = a.new_url
+      let resopnse  = JSON.parse(val.data)
+      if(resopnse.status === 1){
+        this.newIcon = resopnse.new_url
       }else{
         wx.showToast({
           title: '图片上传失败',
@@ -290,8 +289,8 @@ export default {
           that.inputstwo.text = _worklive.name
           that.inputstwo.val = _worklive.value
         }
-        
-      } 
+
+      }
     })
   },
 };
