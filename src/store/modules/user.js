@@ -30,7 +30,7 @@ const user = {
     },
     //未读信息数量
     SET_MSGNUMBER: (state, number) => {
-      state.msgNumber = msgNumber;
+      state.msgNumber = number;
     },
     // 登录
     LOGIN: (state) => {

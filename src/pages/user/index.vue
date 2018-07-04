@@ -48,7 +48,7 @@ export default {
           loginIcon: "/static/images/loginMessage.png",
           isMessage: true,
           eventParam: "/pages/message/main",
-          number: '999+'
+          number: 0
         },
         {
           name: "我要吐槽",
@@ -71,7 +71,10 @@ export default {
     userHeader
   },
   computed:{
-    ...mapGetters(['token','userInfo','isLogin'])
+    ...mapGetters(['token','userInfo','isLogin','msgNumber'])
+  },
+  created(){
+    this.lists[2].number=this.msgNumber
   },
   methods: {
     listEvent(url) {
