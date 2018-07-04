@@ -190,6 +190,7 @@ export default {
     },
 
     loadInfo:function () {
+      let that = this
       let myDate = new Date()
       this.promptDate = `${myDate.getFullYear()}年${myDate.getMonth()+1}月${myDate.getDate()}日`;
       homeLoad({
@@ -204,6 +205,22 @@ export default {
         this.datajson = data.datajson || 0;
         this.res = data.res || [];
       }).catch(error=>{});
+      myMassage({
+        separate:1,
+        msgtype:5,
+        status_2:"no",
+        page:1,
+        token:that.token
+      }).then(r=>{
+        let a =parseInt(r.data.unreadNumber)
+         that.$store.dispatch("SetMsgNumber",a)
+      }).catch(err=>{
+        wx.showToast({
+            title: res,
+            icon: 'none',
+            duration: 1000
+          });
+      })
     },
 
     scrollTop:function(e){

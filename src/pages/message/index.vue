@@ -193,7 +193,9 @@ export default {
             method: "post"
         }).then(res => {
             if(res.data) {
-                let msgs = res.data.res
+
+                this.$store.dispatch('SetMsgNumber',parseInt(res.data.unreadNumber))     
+                let msgs = res.data.res?res.data.res:[];
                 this.couldLoadMore = msgs?true:false;
                 this.msgType = msgtype
                 this.msgStatus = status

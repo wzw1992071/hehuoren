@@ -5,6 +5,7 @@ const user = {
     isLogin: false,// 登录标识
     token: "",//token
     userInfo: null,// 用户信息
+    msgNumber:0 //未读信息
   },
   mutations: {
     //登出
@@ -26,6 +27,10 @@ const user = {
         data:token
       });
       state.isLogin = true
+    },
+    //未读信息数量
+    SET_MSGNUMBER: (state, number) => {
+      state.msgNumber = number;
     },
     // 登录
     LOGIN: (state) => {
@@ -91,9 +96,12 @@ const user = {
     SetUserinfo({commit}, userInfo) {
       commit('SET_USERINFO', userInfo)
     },
-    UpdateInfo({commit}) {
-      commit('UPDATE_USERINFO')
-    }
+    UpdateInfo({commit},number) {
+      commit('UPDATE_USERINFO',number)
+    },
+    SetMsgNumber({commit}) {
+      commit('SET_MSGNUMBER')
+    },
   }
 }
 
