@@ -194,7 +194,7 @@ export default {
         }).then(res => {
             if(res.data) {
 
-                // this.$store.dispatch('SetMsgNumber',parseInt(res.data.unreadNumber))     
+                this.$store.dispatch('SetMsgNumber',parseInt(res.data.unreadNumber))     
                 let msgs = res.data.res?res.data.res:[];
                 this.couldLoadMore = msgs?true:false;
                 this.msgType = msgtype

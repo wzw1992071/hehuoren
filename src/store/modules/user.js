@@ -96,8 +96,8 @@ const user = {
     SetUserinfo({commit}, userInfo) {
       commit('SET_USERINFO', userInfo)
     },
-    UpdateInfo({commit}) {
-      commit('UPDATE_USERINFO')
+    UpdateInfo({commit},number) {
+      commit('UPDATE_USERINFO',number)
     },
     SetMsgNumber({commit}) {
       commit('SET_MSGNUMBER')
