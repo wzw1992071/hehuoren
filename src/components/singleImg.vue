@@ -10,7 +10,7 @@
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 import {mapGetters} from "vuex";
 export default {
   props: ['info'],
@@ -18,7 +18,7 @@ export default {
     return {
       title: '',
       tip: '',
-      img: '/static/images/default.png'
+      img: '/static/images/default.png',
     };
   },
   components: {},
@@ -26,43 +26,66 @@ export default {
     ...mapGetters(['baseUrl','token']),
   },
   methods: {
-   
-    getImg() {
-      let that = this
-
-      wx.chooseImage({
-        success: function(res) {
-          that.img = res.tempFilePaths[0];
-          console.log(res.tempFiles)
-          var tempFilePaths = res.tempFilePaths
-          wx.uploadFile({
-            url: `${that.baseUrl}Index/file`, 
-            filePath: tempFilePaths[0],
-            name: 'file',
-            formData:{
-              'token': that.token
-            },
-            success: function(res){
-              that.$emit("geturl", res);
-              //do something
+    async getImg() {
+      try{
+        let type = await this.wxChooseType();
+        let chooseRes = await this.wxChooseImg(type);
+        this.img = chooseRes.tempFilePaths[0];
+        this.wxUpFile(chooseRes.tempFilePaths[0])
+      }catch (e){
+        console.log(e)
+      }
+    },
+    /*选取方式*/
+    wxChooseType(){
+      return new Promise(resolve=>{
+        wx.showActionSheet({
+          itemList: ['从相册中选择', '拍照'],
+          success: function(res) {
+            if (!res.cancel) {
+              if(res.tapIndex == 0){
+                resolve('album')
+              }else if(res.tapIndex == 1){
+                resolve('camera')
+              }
             }
-          })
+          }
+        })
+      })
+    },
+    /*选择图片*/
+    wxChooseImg(type){
+      return new Promise((resolve,reject)=>{
+        wx.chooseImage({
+          sourceType: [type],
+          count:1,
+          success:function(res){
+            resolve(res)
+          },
+          fail:function(error){
+            reject(error)
+          }
+        })
+      })
+    },
+    /*上传*/
+    wxUpFile(filePath){
+      let _this = this;
+      console.log(_this.token)
+      wx.uploadFile({
+        url: `${_this.baseUrl}Index/file`,
+        header: {
+          'content-type': 'multipart/form-data'
+        }, // 设置请求的 header
+        filePath: filePath,
+        name: 'file',
+        formData: {
+          'token': _this.token,
+        },
+        success: function (res) {
+          _this.$emit("geturl", res);
         }
       })
-
-      // wx.chooseImage({
-      //   success: function(res) {
-      //     that.img = res.tempFilePaths[0];
-      //     // console.log(res)
-      //     wx.getImageInfo({
-      //       src: res.tempFilePaths[0],
-      //       success: function(res) {
-      //         that.$emit("geturl", res.path);
-      //         //   console.log(res);
-      //       }
-      //     });
-      //   }
-      // });
     }
   },
   created() {
