@@ -212,8 +212,8 @@ export default {
         page:1,
         token:that.token
       }).then(r=>{
-        // let a =parseInt(r.data.unreadNumber)
-        //  that.$store.dispatch("SetMsgNumber",a)
+        let a =parseInt(r.data.unreadNumber)
+         that.$store.dispatch("SetMsgNumber",a)
       }).catch(err=>{
         wx.showToast({
             title: res,
