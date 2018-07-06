@@ -55,7 +55,7 @@ export default {
         },
         edit(item){
             wx.navigateTo({
-                url: '/pages/projectModifyMain/main?id='+item.id
+                url: '/pages/projectModifyMain/main?info='+JSON.stringify(item)
             })
         },
         loadMore(){
