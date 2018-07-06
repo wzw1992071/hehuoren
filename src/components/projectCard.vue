@@ -1,8 +1,13 @@
 <template>
     <div class="project-card" :class="{gray: gray}" @click="emitEvent">
-        <div class="collect" @click.stop="collect">
+        <div class="collect" @click.stop="collect" v-if="cardtype===1">
             <img v-if="!collected" src="/static/images/collect.png">
             <img v-if="collected" src="/static/images/collected.png">
+        </div>
+        <div class="collect" @click.stop="edit" v-if="cardtype===2">
+            <!--<img v-if="!collected" src="/static/images/collect.png">-->
+            <!--<img v-if="collected" src="/static/images/collected.png">-->
+            <span class="edit">修改</span>
         </div>
         <div class="img">
             <img :src="detail&&baseUrl+detail.logo">
@@ -38,7 +43,7 @@
     import {mapGetters} from 'vuex'
     import {focuseProject} from '@/apis/index'
     export default {
-        props: ['gray', 'detail'],
+        props: ['gray', 'detail','cardtype'],
         data(){
           return {
             collected:false
@@ -88,6 +93,9 @@
             },
             emitEvent: function () {
                 this.$emit('handlerClick',this.detail)
+            },
+            edit(){
+               this.$emit('handlerEdit',this.detail)
             }
         },
         mounted(){
@@ -262,6 +270,13 @@
 .address {
     font-size: 24rpx;
     color: #999;
+}
+.edit{
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-size: 24rpx;
+    color: #ff7803;
 }
 </style>
 

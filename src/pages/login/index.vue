@@ -30,7 +30,7 @@
   export default {
     data() {
       return {
-        tel:"15908445448",
+        tel:"16602826416",
         pwd:"123456",
       }
     },

@@ -41,7 +41,7 @@
     <div class="item-content">
       <scroll-view scroll-y style="height: 100%" @scrolltolower="loadmore">
         <div v-for="(item,key,index) in list" v-bind:key="key">
-          <project-card @handlerClick="loadDetail" :detail="item" ></project-card>
+          <project-card @handlerClick="loadDetail" :cardtype="1" :detail="item" ></project-card>
         </div>
       </scroll-view>
     </div>

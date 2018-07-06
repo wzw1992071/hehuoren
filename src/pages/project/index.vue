@@ -9,7 +9,7 @@
       <div class="item-content">
         <scroll-view scroll-y style="height: 100%" @scrolltolower="loadMore">
           <div v-for="(item,key,index) in list" :key="key">
-            <project-card :gray="1" @handlerClick="loadDetail" :detail="item" ></project-card>
+            <project-card :gray="1" :cardtype="cardType" @handlerEdit="edit" @handlerClick="loadDetail" :detail="item" ></project-card>
           </div>
         </scroll-view>
       </div>
@@ -25,13 +25,14 @@ export default {
     data: function () {
         return {
             tabs:[
-              {title:'发布的',active:true},
-              {title:'关注的',active:false},
-              {title:'洽谈的',active:false},
-              {title:'合伙中',active:false}
+              {title:'发布的',active:true,cardType:2},
+              {title:'关注的',active:false,cardType:3},
+              {title:'洽谈的',active:false,cardType:3},
+              {title:'合伙中',active:false,cardType:3}
             ],
             type:1,
             page:1,
+            cardType:2,
             couldLoadMore:true,
             list:[]
         }
@@ -52,8 +53,12 @@ export default {
             })
           }
         },
+        edit(item){
+            wx.navigateTo({
+                url: '/pages/projectModifyMain/main?id='+item.id
+            })
+        },
         loadMore(){
-            console.log('more')
             if(this.couldLoadMore){
               this.page++;
               this.queryMyObjInfo();
@@ -64,6 +69,7 @@ export default {
           for (let i = 0; i < this.tabs.length; i++) {
             if (index - 1 == i) {
               this.tabs[i].active = true
+              this.cardType = this.tabs[i].cardType;
             } else {
               this.tabs[i].active = false
             }

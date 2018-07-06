@@ -25,8 +25,8 @@
             <inputs @change="getVal" :info="proDetail4" v-if="inputShow[3]"></inputs>
         </div>
         <div class="footer">
-            <modify-input :info="projectSave"></modify-input>
-            <modify-input :info="projectContinue"></modify-input>
+            <modify-input @handleEvent="save" :info="projectSave"></modify-input>
+            <modify-input  :info="projectContinue"></modify-input>
         </div>
     </div>
 </template>
@@ -201,7 +201,7 @@ export default {
     },
     methods: {
         save: function (evt) {
-            console.log(evt)
+           console.log(this.$data)
         },
         getVal: function (params) {
            let _val =  params.val
