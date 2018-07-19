@@ -9,7 +9,7 @@
             <input type="text" class="text" :placeholder="text" v-model="val" @change="change">
             <span class="measurement">{{ measurement }}</span>
         </div>
-      
+
         <div v-if="type == 3" class="type-three type" @click="toggleShow">
             <div class="title">{{title}}</div>
             <picker class="text" v-if="type == 3" mode='selector' @change="getVal($event)" range-key="name" :value="0" :range="options">
@@ -83,14 +83,14 @@ export default {
                     text: target.name,
                     handler: this.handler,
                     val:target.value
-                }) 
+                })
             }else{
                 this.$emit('change', {
                     text: this.text,
                     handler: this.handler,
-                }) 
+                })
             }
-            
+
         }
     },
     created () {
@@ -138,7 +138,7 @@ export default {
             flex-grow: 1;
         }
         .text {
-            text-align: left;           
+            text-align: left;
             flex-grow: 2;
         }
     }
@@ -173,7 +173,7 @@ export default {
                 width: 36rpx;
                 height: 21rpx;
             }
-        }       
+        }
     }
     > .istip {
         width: 100%;
