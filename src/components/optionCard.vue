@@ -13,7 +13,7 @@
                     :key="index"
                     class="list-item"
                     @click="selected(item)"
-                >{{item}}</div>
+                >{{item? item.typename ? item.typename : item.code ? item.code : item : item}}</div>
             </div>
         </div>
     </div>

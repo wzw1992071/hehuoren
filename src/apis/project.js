@@ -12,3 +12,21 @@ export function projectAdd(data) {
     method:'POST'
   });
 }
+
+export function getProjectInfo(data) {
+  return service({
+    url:'/project/add',
+    data,
+    method:'POST'
+  });
+}
+
+export function getHYDetails(data) {
+  return service({
+    url:'/Index/get_hangyedetaillist',
+    data,
+    method:'GET'
+  });
+}
+
+

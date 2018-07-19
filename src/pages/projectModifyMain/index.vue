@@ -105,33 +105,6 @@ export default {
             }
           }
         })
-//        let params = new URLSearchParams()
-//        params.append('step', step)
-//        params.append('token', this.token)
-//        params.append('separate', 1)
-//        let _projectid = this.$route.query.projectid
-//        if(_projectid) {
-//          params.append('projectid', _projectid)
-//        }
-//        localStorage.removeItem(`hehuoren_project_${step}`)
-//        request({
-//          url: '/project/add',
-//          method: 'post',
-//          data: params
-//        }).then(res => {
-//          console.log(res)
-//          if(res && res.step == step){
-//            localStorage.setItem(`hehuoren_project_${step}`, JSON.stringify(res.data))
-//            if(this.$route.query.grade >= i-1 ) {
-//              this.$router.push({path: path})
-//            } else {
-//              Toast({
-//                message: '请先填写完上一步资料',
-//                duration: 1000
-//              })
-//            }
-//          }
-//        })
       }
     },
     mounted() {

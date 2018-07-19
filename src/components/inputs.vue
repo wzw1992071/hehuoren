@@ -12,19 +12,16 @@
 
         <div v-if="type == 3" class="type-three type" @click="toggleShow">
             <div class="title">{{title}}</div>
-            <picker class="text" v-if="type == 3" mode='selector' @change="getVal($event)" range-key="name" :value="0" :range="options">
-               {{text}}
-            </picker>
-            <!-- <div ></div> -->
+            <div class="text">{{text}}</div>
             <div class="arrow"><img src="/static/images/arrowDownFine.png"></div>
         </div>
-        <!-- <option-card
-            v-if="type == 3 && show "
-            :lists="options"
-            :title="optionsTitle"
-            @close="close"
-            @selected="getVal"
-        ></option-card>  -->
+        <option-card
+          v-if="type == 3 && show "
+          :lists="lists"
+          :title="optionsTitle"
+          @close="close"
+          @selected="getVal"
+        ></option-card>
         <div class="tip" v-if="tip">{{tip}}</div>
     </div>
 </template>
@@ -38,21 +35,7 @@ export default {
         return {
             // 弹出选项列表显示状态
             show: false,
-            type: 1,
-            // type 1, type 2, type 3
-            title: '',
-            // type 1, type 2
-            text: '',
-            // type 2
-            measurement: '',
-            // type 3
-            optionsTitle: '',
-            options: [],
-            // 值
             val: '',
-            // 值的接收者
-            handler: '',
-            tip: ''
         }
     },
     components: {
@@ -93,19 +76,51 @@ export default {
 
         }
     },
-    created () {
-        let _info = this.info
-        if(_info) {
-            this.type = _info.type ? _info.type : this.type
-            this.handler = _info.handler ? _info.handler : this.handler
-            this.measurement = _info.measurement ? _info.measurement : this.measurement
-            this.options = _info.options ? _info.options : this.options
-            this.text = _info.options ? _info.options[0].text : this.text
-            this.text = _info.text ? _info.text : this.text
-            this.title = _info.title ? _info.title : this.title
-            this.optionsTitle = _info.optionsTitle ? _info.optionsTitle : this.optionsTitle
-            this.tip = _info.tip ? _info.tip : this.tip
-        }
+    computed:{
+      'type': function () {
+        let _info = this.info;
+        return _info.type ? _info.type : 1
+      },
+      'handler': function () {
+        let _info = this.info;
+        return _info.handler ? _info.handler : ''
+      },
+      'measurement': function () {
+        let _info = this.info;
+        return  _info.measurement ? _info.measurement : ""
+      },
+      'options': function () {
+        let _info = this.info;
+        return _info.options ? _info.options : []
+      },
+      'text': function () {
+        let _info = this.info;
+        return _info.options
+          ? _info.options[0]
+            ? _info.options[0].typename
+              ? _info.options[0].typename
+              : _info.options[0].code
+                ? _info.options[0].code
+                : _info.options[0]
+            : _info.text
+          : _info.text
+      },
+      'title': function () {
+        let _info = this.info;
+        return _info.title ? _info.title : ""
+      },
+      'optionsTitle': function () {
+        let _info = this.info;
+        return _info.optionsTitle ? _info.optionsTitle : []
+      },
+      'tip': function () {
+        let _info = this.info;
+        return _info.tip ? _info.tip : ''
+      },
+      'lists':function () {
+        let _info = this.info;
+        return _info.options
+      }
     }
 }
 </script>
