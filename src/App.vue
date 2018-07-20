@@ -8,6 +8,7 @@ export default {
 
     console.log('app created and cache logs by setStorageSync');
 
+    this.$store.dispatch('UpdateInfo');
   }
 }
 </script>

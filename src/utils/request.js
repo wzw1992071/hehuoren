@@ -1,5 +1,5 @@
 // 使用微信request
-const uri = 'http://api.schehuoren.com';
+const uri = 'http://www.schehuoren.com';
 const request = ({url,method,data}) =>{
   return new Promise((resolve,reject)=>{
     wx.showLoading();

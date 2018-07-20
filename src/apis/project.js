@@ -12,7 +12,10 @@ export function projectAdd(data) {
     method:'POST'
   });
 }
-
+/**
+ * 获取项目信息
+ * @param data
+ */
 export function getProjectInfo(data) {
   return service({
     url:'/project/add',
@@ -20,7 +23,10 @@ export function getProjectInfo(data) {
     method:'POST'
   });
 }
-
+/**
+ *
+ * @param data
+ */
 export function getHYDetails(data) {
   return service({
     url:'/Index/get_hangyedetaillist',

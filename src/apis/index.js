@@ -6,7 +6,7 @@ import service from '@/utils/request';
  */
 export function homeLoad(data) {
   return service({
-    url:'/',
+    url:'',
     data,
     method:'POST'
   });

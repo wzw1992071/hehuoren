@@ -16,10 +16,10 @@
             <div class="arrow"><img src="/static/images/arrowDownFine.png"></div>
         </div>
         <option-card
-          v-if="type == 3 && show "
+          v-if="type == 3"
+          :show.sync = 'show'
           :lists="lists"
           :title="optionsTitle"
-          @close="close"
           @selected="getVal"
         ></option-card>
         <div class="tip" v-if="tip">{{tip}}</div>
@@ -51,22 +51,15 @@ export default {
         toggleShow: function () {
             this.show = !this.show
         },
-        close: function () {
-            this.show = false
-        },
-        getVal: function (event) {
-            let target
-            if(event){
-                let index = event.mp.detail.value;
-                target = this.options[index];
-            }
+        getVal: function (target) {
             if(this.type==3){
-                this.text=target.name
-                this.$emit('change', {
-                    text: target.name,
-                    handler: this.handler,
-                    val:target.value
-                })
+                this.text=target
+
+//                this.$emit('change', {
+//                    text: target.name,
+//                    handler: this.handler,
+//                    val:target.value
+//                })
             }else{
                 this.$emit('change', {
                     text: this.text,

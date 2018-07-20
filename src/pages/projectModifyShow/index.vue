@@ -69,14 +69,14 @@
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 import userHeader from '@/components/userHeader'
 import modifyHeader from '@/components/modifyHeader'
 import modifyInput from '@/components/modifyInput'
 import modifyTextarea from '@/components/modifyTextarea'
 import singleImg from '@/components/singleImg'
 import inputs from '@/components/inputs'
-import {getProjectInfo} from '@/apis/project'
+import {getProjectInfo, getHYDetails} from '@/apis/project'
 import {mapGetters} from 'vuex'
 
 export default {
@@ -405,7 +405,6 @@ export default {
       params.append("separate", 1);
       params.append("data_json", data);
       this.projectid ? params.append("projectid", this.projectid) : null;
-      // params.append('projectid', 149)
       return request({
         url: url,
         data: params,
@@ -452,121 +451,109 @@ export default {
       // return fetch(`http://api.map.baidu.com/place/v2/suggestion?query=${query}&region=成都&city_limit=true&output=json&ak=${this.baiduKey}`)
     },
     init() {
-      let _data = localStorage.getItem("hehuoren_project_1");
+      let self = this;
       let data;
+      wx.getStorage({
+        key:"hehuoren_project_1",
+        success:function(res){
+          if(!!res.data) {
+            data = JSON.parse(res.data);
+            self.projectDeal(data)
+          }else{
+            getProjectInfo({
+              step: 1,
+              token: '',
+              separate: 1,
+              projectid: self.projectid
+            }).then(
+              res => {
+                data = res.data;
+                self.projectDeal(data);
+              }
+            );
+          }
+        }
+      });
+    },
+    projectDeal(data){
+      if(!data) return
       let streets;
-      if (_data) {
-        data = JSON.parse(_data);
-      } else {
-        let param = {
-          step:1,
-          token:'',
-          separate:1,
-          projectid:this.projectid
-        }
-        getProjectInfo(param).then(
-          res => {
-            data = res.data;
-          }
-        );
+      let cities = Object.values(data.city);
+      this.areas = cities;
+      this.proAddress1.options = []
+      this.proAddress2.options = []
+      this.proAddress3.options = []
+      this.proAddress4.options = []
+      console.log(cities)
+      for (let i = 0; i < cities.length; i++) {
+        this.proAddress1.options.push(cities[i]);
+        this.proAddress2.options.push(cities[i]);
+        this.proAddress3.options.push(cities[i]);
+        this.proAddress4.options.push(cities[i]);
       }
-      if (data) {
-        let cities = Object.values(data.city);
-        this.areas = cities;
-        this.proAddress1.options = []
-        this.proAddress2.options = []
-        this.proAddress3.options = []
-        this.proAddress4.options = []
-        console.log(cities)
-        for (let i = 0; i < cities.length; i++) {
-          this.proAddress1.options.push(cities[i]);
-          this.proAddress2.options.push(cities[i]);
-          this.proAddress3.options.push(cities[i]);
-          this.proAddress4.options.push(cities[i]);
-        }
+      let _hangye = data.hangye;
+      this.hangye = [];
+      this.hangye = this.hangye.concat(_hangye);
+      this.proIndustry = Object.assign({}, this.proIndustry, {
+        options: _hangye
+      });
 
-        let _hangye = data.hangye;
-        this.hangye = [];
-        this.hangye = this.hangye.concat(_hangye);
-        this.proIndustry = Object.assign({}, this.proIndustry, {
-          options: _hangye
-        });
-
-        let infos = data.xiangmuinfo;
-        if (infos) {
-          this.logo = infos.logo;
-          this.proLogo.img = infos.logo;
-          this.proName.text = this.title = infos.title;
-          this.area = infos.area.split(",");
-          this.shop_area = [];
-          for (var i = 0; i < this.area.length; i++) {
-            let addr = Object.values(this.areas).find( item => item.area == this.area[i]);
-            if(addr){
-              this.$data[`proAddress${i + 1}`] = Object.assign( {}, this.$data[`proAddress${i + 1}`], { text: addr.name });
-              this.shop_area.push(addr.name);
-            }
-          }
-          this.proIndustry.text = data.hangyeInfo.typename
-            ? data.hangyeInfo.typename
-            : null;
-          this.proField.text = data.hangyedetailInfo.typename
-            ? data.hangyedetailInfo.typename
-            : this.proField.options[0];
-
-          this.proShortintro.text = this.yijuhua = infos.yijuhua;
-          this.proIntro.default = this.description = infos.description;
-          this.projectfrom = this.proOrigin.text = infos.projectfrom;
-          this.xiangmu_hy = infos.xiangmu_hy;
-          this.xiangmu_hy_detail = infos.xiangmu_hy_detail;
-          this.jieduan = infos.jieduan;
-          this.proStage.text = this.proStage.options[
-          infos.jieduan - 1
-            ].typename;
-          this.shop_area = infos.shop_area
-            ? infos.shop_area.split(",")
-            : this.shop_area;
-          this.shop_jiedao = infos.shop_jiedao
-            ? infos.shop_jiedao
-            : this.shop_jiedao;
-          this.proOrigin.text = this.projectfrom = infos.projectfrom;
-
-          if(infos.planshopcontent) {
-            streets = Object.values(infos.planshopcontent)
-            for(let i = 0; i < streets.length; i++) {
-              this.shop_area.push(streets[i].shop_jiedao)
-              let _street_key = "proDetail"
-              _street_key = _street_key+(i+1)
-              this.$data[_street_key].text = streets[i].shop_jiedao
-              this.$data[_street_key].outval = streets[i].shop_jiedao
-            }
+      let infos = data.xiangmuinfo;
+      if (infos) {
+        this.logo = infos.logo;
+        this.proLogo.img = infos.logo;
+        this.proName.text = this.title = infos.title;
+        this.area = infos.area.split(",");
+        this.shop_area = [];
+        for (var i = 0; i < this.area.length; i++) {
+          let addr = Object.values(this.areas).find( item => item.area == this.area[i]);
+          if(addr){
+            this.$data[`proAddress${i + 1}`] = Object.assign( {}, this.$data[`proAddress${i + 1}`], { text: addr.name });
+            this.shop_area.push(addr.name);
           }
         }
-
-        this.projectid = data.projectid ? data.projectid : null;
-        data.hangyeInfo &&
-        data.hangyeInfo.id &&
-        request({
-          url: `/Index/get_hangyedetaillist?separate=1&token=${
-            this.$store.getters.token
-            }&id=${data.hangyeInfo.id}`
-        }).then(res => {
-          if (res.status == 1) {
-            for (let i = 0; i < res.data.length; i++) {
-              this.proField.options.push(res.data[i]);
-            }
+        this.proIndustry.text = data.hangyeInfo.typename ? data.hangyeInfo.typename : null;
+        this.proField.text = data.hangyedetailInfo.typename ? data.hangyedetailInfo.typename : this.proField.options[0];
+        this.proShortintro.text = this.yijuhua = infos.yijuhua;
+        this.proIntro.default = this.description = infos.description;
+        this.projectfrom = this.proOrigin.text = infos.projectfrom;
+        this.xiangmu_hy = infos.xiangmu_hy;
+        this.xiangmu_hy_detail = infos.xiangmu_hy_detail;
+        this.jieduan = infos.jieduan;
+        this.proStage.text = this.proStage.options[infos.jieduan - 1].typename;
+        this.shop_area = infos.shop_area ? infos.shop_area.split(",") : this.shop_area;
+        this.shop_jiedao = infos.shop_jiedao ? infos.shop_jiedao : this.shop_jiedao;
+        this.proOrigin.text = this.projectfrom = infos.projectfrom;
+        if(infos.planshopcontent) {
+          streets = Object.values(infos.planshopcontent)
+          for(let i = 0; i < streets.length; i++) {
+            this.shop_area.push(streets[i].shop_jiedao)
+            let _street_key = "proDetail"
+            _street_key = _street_key+(i+1)
+            this.$data[_street_key].text = streets[i].shop_jiedao
+            this.$data[_street_key].outval = streets[i].shop_jiedao
           }
-        });
-      }
-      if (!this.projectid) {
-        if (this.$route.query.projectid) {
-          this.projectid = this.$route.query.projectid;
         }
       }
+      this.projectid = data.projectid ? data.projectid : null;
+      data.hangyeInfo && data.hangyeInfo.id &&
+      getHYDetails({
+        separate:1,
+        token:this.token,
+        id:data.hangyeInfo.id
+      }).then(res=>{
+        if (res.status == 1) {
+          for (let i = 0; i < res.data.length; i++) {
+            this.proField.options.push(res.data[i]);
+          }
+        }
+      })
     }
   },
   onLoad: function(option){
     let project = JSON.parse(option.info);
     this.projectid = project.id;
+    this.init();
   },
   computed:{
     ...mapGetters(['token'])

@@ -1,5 +1,5 @@
 <template>
-    <div class="mock">
+    <div class="mock" v-if="show">
         <div class="option-card">
             <div class="title">
                 <span>{{title}}</span>
@@ -7,26 +7,27 @@
                     <img src="/static/images/close.png">
                 </div>
             </div>
-            <div class="lists">
+            <scroll-view scroll-y style="height: 500rpx" class="lists">
                 <div
                     v-for="(item, index) in lists"
                     :key="index"
                     class="list-item"
                     @click="selected(item)"
                 >{{item? item.typename ? item.typename : item.code ? item.code : item : item}}</div>
-            </div>
+            </scroll-view>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['title','lists'],
+    props: ['title','lists','show'],
     methods: {
         close: function () {
-            this.$emit('close')
+          this.$emit('update:show',false)
         },
         selected: function (val) {
+            this.$emit('update:show',false)
             this.$emit('selected', val)
         }
     }
